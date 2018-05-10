@@ -15,10 +15,36 @@ def load_recipes():
     # new data and no duplicates
     SampleFNRecipe.query.delete()
 
-    # Read CSV data file & insert data
-    for row in open("../scrapy/recipe_yum/recipe_yum/spiders/all_recipes_0.csv"):
-        row = row.rstrip()
-        total_time, active_time, ingredients, url, preparation, difficulty, recipe_name, inactive_time, special_equipment, prep_time, servings, recipe_author, photo_url, category_tags, cook_time = row.split(",")
+    # >>> f = open("all_recipes_0.csv")
+    # >>> lines = f.readlines()
+    # >>> lines[0]
+    # >>> lines[0].split(",")
+
+    recipe_file = open("../scrapy/recipe_yum/recipe_yum/spiders/all_recipes_0.csv")
+    recipe_lines = recipe_file.readlines()
+
+    for line in recipe_lines:
+        line = line.split(",")
+        total_time = line[0]
+        active_time = line[1]
+        ingredients = line[2]
+        url = line[3]
+        preparation = line[4]
+        difficulty = line[5]
+        recipe_name = line[6]
+        inactive_time = line[7]
+        special_equipment = line[8]
+        prep_time = line[9]
+        servings = line[10]
+        recipe_author = line[11]
+        photo_url = line[12]
+        category_tags = line[13]
+        cook_time = line[14]
+
+        # Read CSV data file & insert data
+        # for row in open("../scrapy/recipe_yum/recipe_yum/spiders/all_recipes_0.csv"):
+        #     row = row.rstrip().split(",")
+
 
         recipe = SampleFNRecipe(recipe_name=recipe_name,
                                 recipe_author=recipe_author,
@@ -65,5 +91,5 @@ if __name__ == "__main__":
     db.create_all()
 
     # Import different types of data
-    load_recipe()
+    load_recipes()
     set_val_recipe_id()
