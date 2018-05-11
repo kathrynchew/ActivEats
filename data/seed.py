@@ -1,7 +1,6 @@
 """ Utility file to clean & seed recipe database from scraped data """
 
 from sqlalchemy import func
-# from datetime import datetime, datetime
 from model import SampleFNRecipe, connect_to_db, db
 from server import app
 import json
@@ -17,23 +16,31 @@ def load_recipes():
     SampleFNRecipe.query.delete()
 
 
-    # recipe_file = open("../scrapy/recipe_yum/recipe_yum/spiders/all_recipes_jsontest.json")
+   # Open JSON file & parse lines
     with open("../scrapy/recipe_yum/recipe_yum/spiders/all_recipes_jsontest.json") as file:
         recipe_lines = json.load(file)
 
     for line in recipe_lines:
-        ingredients = line['ingredients']
         url = line['url']
         difficulty = line['difficulty']
         recipe_name = line['recipe_name']
         servings = line['servings']
         recipe_author = line['recipe_author']
         photo_url = line['photo_url']
-        category_tags = line['category_tags']
 
 
         ########################################################################
-        # SPECIAL EQUIPMENT: Populate with null if null; clean formatting where 
+        # CATEGORY TAGS: Populate value as an array
+
+        category_tags = line['category_tags']
+
+        ########################################################################
+        # INGREDIENTS: Populate value as an array
+
+        ingredients = line['ingredients']
+
+        ########################################################################
+        # SPECIAL EQUIPMENT: Populate with null if null; clean formatting where
         # not null
 
         if len(line['special_equipment']) == 0:
@@ -49,7 +56,7 @@ def load_recipes():
 
         ########################################################################
         # PREP INSTRUCTIONS: Clean formatting & add cleaned list of <p> contents
-        
+
         stripped_prep = []
         for p in line['preparation']:
             stripped_prep.append(p.lstrip().rstrip())

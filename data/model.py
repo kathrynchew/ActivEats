@@ -1,6 +1,7 @@
 """ Models and database functions for ActivEats project """
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.dialects import postgresql
 
 db = SQLAlchemy()
 
@@ -18,21 +19,19 @@ class SampleFNRecipe(db.Model):
     recipe_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     recipe_name = db.Column(db.Text, nullable=False)
     recipe_author = db.Column(db.Text, nullable=True)
-    category_tags = db.Column(db.Text, nullable=False)
+    category_tags = db.Column(db.ARRAY(db.Text), nullable=False)
     difficulty = db.Column(db.Text, nullable=True)
     servings = db.Column(db.Text, nullable=False)
     special_equipment = db.Column(db.Text, nullable=True)
-    ingredients = db.Column(db.Text, nullable=False)
+    ingredients = db.Column(db.ARRAY(db.Text), nullable=False)
     preparation = db.Column(db.Text, nullable=False)
-    # total_time = db.Column(db.Text, nullable=False)
-    prep_time = db.Column(db.Text, nullable=True)
-    cook_time = db.Column(db.Text, nullable=True)
-    active_time = db.Column(db.Text, nullable=True)
-    inactive_time = db.Column(db.Text, nullable=True)
+    total_time = db.Column(db.Interval, nullable=True)
+    prep_time = db.Column(db.Interval, nullable=True)
+    cook_time = db.Column(db.Interval, nullable=True)
+    active_time = db.Column(db.Interval, nullable=True)
+    inactive_time = db.Column(db.Interval, nullable=True)
     photo_url = db.Column(db.Text, nullable=True)
     recipe_url = db.Column(db.Text, nullable=False)
-
-    total_time = db.Column(db.Interval, nullable=True)
 
 
 
