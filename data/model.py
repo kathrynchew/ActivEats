@@ -16,21 +16,25 @@ class SampleFNRecipe(db.Model):
     __tablename__ = "food_network_inspect"
 
     recipe_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    recipe_name = db.Column(db.String(1000), nullable=False)
-    recipe_author = db.Column(db.String(1000), nullable=True)
-    category_tags = db.Column(db.String(1000), nullable=False)
-    difficulty = db.Column(db.String(500), nullable=True)
-    servings = db.Column(db.String(500), nullable=False)
-    special_equipment = db.Column(db.String(500), nullable=True)
-    ingredients = db.Column(db.String(5000), nullable=False)
-    preparation = db.Column(db.String(10000), nullable=False)
-    total_time = db.Column(db.String(100), nullable=False)
-    prep_time = db.Column(db.String(100), nullable=True)
-    cook_time = db.Column(db.String(100), nullable=True)
-    active_time = db.Column(db.String(100), nullable=True)
-    inactive_time = db.Column(db.String(100), nullable=True)
-    photo_url = db.Column(db.String(1000), nullable=True)
-    recipe_url = db.Column(db.String(1000), nullable=False)
+    recipe_name = db.Column(db.Text, nullable=False)
+    recipe_author = db.Column(db.Text, nullable=True)
+    category_tags = db.Column(db.Text, nullable=False)
+    difficulty = db.Column(db.Text, nullable=True)
+    servings = db.Column(db.Text, nullable=False)
+    special_equipment = db.Column(db.Text, nullable=True)
+    ingredients = db.Column(db.Text, nullable=False)
+    preparation = db.Column(db.Text, nullable=False)
+    # total_time = db.Column(db.Text, nullable=False)
+    prep_time = db.Column(db.Text, nullable=True)
+    cook_time = db.Column(db.Text, nullable=True)
+    active_time = db.Column(db.Text, nullable=True)
+    inactive_time = db.Column(db.Text, nullable=True)
+    photo_url = db.Column(db.Text, nullable=True)
+    recipe_url = db.Column(db.Text, nullable=False)
+
+    total_time = db.Column(db.Interval, nullable=True)
+
+
 
     def __repr__(self):
         """ Representative model for recipe items """

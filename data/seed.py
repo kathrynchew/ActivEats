@@ -31,7 +31,11 @@ def load_recipes():
         photo_url = line['photo_url']
         category_tags = line['category_tags']
 
-        # SPECIAL EQUIPMENT: Populate with null if null; clean formatting where not null
+
+        ########################################################################
+        # SPECIAL EQUIPMENT: Populate with null if null; clean formatting where 
+        # not null
+
         if len(line['special_equipment']) == 0:
             special_equipment = None
         else:
@@ -42,34 +46,84 @@ def load_recipes():
                     line['special_equipment'][i] = s[19:].rstrip()
             special_equipment = line['special_equipment']
 
+
+        ########################################################################
         # PREP INSTRUCTIONS: Clean formatting & add cleaned list of <p> contents
+        
         stripped_prep = []
         for p in line['preparation']:
             stripped_prep.append(p.lstrip().rstrip())
         preparation = stripped_prep
 
-        # ALL RECIPE TIMES: Pop with null if null
-        total_time = line['total_time']
 
+        ########################################################################
+        # ALL RECIPE TIMES: Populate with null if null; if not null, typecast
+        # into sql interval type
+
+        times = {
+            'hr': 'hours',
+            'min': 'minutes'
+        }
+
+        # TOTAL TIME
+        if line['total_time'] == 'N/A':
+            total_time = None
+        else:
+            total_time = ""
+            time = line['total_time'].split()
+            for t in time:
+                if t.isnumeric():
+                    total_time = total_time + t
+                else:
+                    total_time = total_time + " {} ".format(times[t])
+
+        # COOK TIME
         if line['cook_time'] == 'N/A':
             cook_time = None
         else:
-            cook_time = line['cook_time']
+            cook_time = ""
+            time = line['cook_time'].split()
+            for t in time:
+                if t.isnumeric():
+                    cook_time = cook_time + t
+                else:
+                    cook_time = cook_time + " {} ".format(times[t])
 
+        # PREP TIME
         if line['prep_time'] == 'N/A':
             prep_time = None
         else:
-            prep_time = line['prep_time']
+            prep_time = ""
+            time = line['prep_time'].split()
+            for t in time:
+                if t.isnumeric():
+                    prep_time = prep_time + t
+                else:
+                    prep_time = prep_time + " {} ".format(times[t])
 
+        # ACTIVE TIME
         if line['active_time'] == 'N/A':
             active_time = None
         else:
-            active_time = line['active_time']
+            active_time = ""
+            time = line['active_time'].split()
+            for t in time:
+                if t.isnumeric():
+                    active_time = active_time + t
+                else:
+                    active_time = active_time + " {} ".format(times[t])
 
+        # INACTIVE TIME
         if line['inactive_time'] == 'N/A':
             inactive_time = None
         else:
-            inactive_time = line['inactive_time']
+            inactive_time = ""
+            time = line['inactive_time'].split()
+            for t in time:
+                if t.isnumeric():
+                    inactive_time = inactive_time + t
+                else:
+                    inactive_time = inactive_time + " {} ".format(times[t])
 
 
 
