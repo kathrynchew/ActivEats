@@ -4,6 +4,7 @@ from sqlalchemy import func
 # from datetime import datetime, datetime
 from model import SampleFNRecipe, connect_to_db, db
 from server import app
+import json
 
 
 def load_recipes():
@@ -15,31 +16,62 @@ def load_recipes():
     # new data and no duplicates
     SampleFNRecipe.query.delete()
 
-    # >>> f = open("all_recipes_0.csv")
-    # >>> lines = f.readlines()
-    # >>> lines[0]
-    # >>> lines[0].split(",")
 
-    recipe_file = open("../scrapy/recipe_yum/recipe_yum/spiders/all_recipes_0.csv")
-    recipe_lines = recipe_file.readlines()
+    # recipe_file = open("../scrapy/recipe_yum/recipe_yum/spiders/all_recipes_jsontest.json")
+    with open("../scrapy/recipe_yum/recipe_yum/spiders/all_recipes_jsontest.json") as file:
+        recipe_lines = json.load(file)
 
     for line in recipe_lines:
-        line = line.split(",")
-        total_time = line[0]
-        active_time = line[1]
-        ingredients = line[2]
-        url = line[3]
-        preparation = line[4]
-        difficulty = line[5]
-        recipe_name = line[6]
-        inactive_time = line[7]
-        special_equipment = line[8]
-        prep_time = line[9]
-        servings = line[10]
-        recipe_author = line[11]
-        photo_url = line[12]
-        category_tags = line[13]
-        cook_time = line[14]
+        ingredients = line['ingredients']
+        url = line['url']
+        difficulty = line['difficulty']
+        recipe_name = line['recipe_name']
+        servings = line['servings']
+        recipe_author = line['recipe_author']
+        photo_url = line['photo_url']
+        category_tags = line['category_tags']
+
+        # SPECIAL EQUIPMENT: Populate with null if null; clean formatting where not null
+        if len(line['special_equipment']) == 0:
+            special_equipment = None
+        else:
+            for i in range(len(line['special_equipment'])):
+                s = line['special_equipment'][i].lstrip()
+                prefix = s[:19]
+                if prefix == "Special equipment: ":
+                    line['special_equipment'][i] = s[19:].rstrip()
+            special_equipment = line['special_equipment']
+
+        # PREP INSTRUCTIONS: Clean formatting & add cleaned list of <p> contents
+        stripped_prep = []
+        for p in line['preparation']:
+            stripped_prep.append(p.lstrip().rstrip())
+        preparation = stripped_prep
+
+        # ALL RECIPE TIMES: Pop with null if null
+        total_time = line['total_time']
+
+        if line['cook_time'] == 'N/A':
+            cook_time = None
+        else:
+            cook_time = line['cook_time']
+
+        if line['prep_time'] == 'N/A':
+            prep_time = None
+        else:
+            prep_time = line['prep_time']
+
+        if line['active_time'] == 'N/A':
+            active_time = None
+        else:
+            active_time = line['active_time']
+
+        if line['inactive_time'] == 'N/A':
+            inactive_time = None
+        else:
+            inactive_time = line['inactive_time']
+
+
 
         # Read CSV data file & insert data
         # for row in open("../scrapy/recipe_yum/recipe_yum/spiders/all_recipes_0.csv"):
