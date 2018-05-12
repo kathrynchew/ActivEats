@@ -1,13 +1,23 @@
 """ Utility file to clean & seed recipe database from scraped data """
 
 from sqlalchemy import func
-from model import SampleFNRecipe, connect_to_db, db
+from model import SampleFNRecipe, Ingredient, connect_to_db, db
 from server import app
 import json
+import re
+from sqlalchemy.dialects.postgresql import array, ARRAY
+from sqlalchemy.sql.functions import Cast
 
 
+# Open JSON file & parse lines
+with open("../scrapy/recipe_yum/recipe_yum/spiders/all_recipes_jsontest.json") as file:
+    recipe_lines = json.load(file)
+
+################################################################################
+################################# LOAD RECIPES #################################
+################################################################################
 def load_recipes():
-    """ Load recipes into SAMPLE database """
+    """ Load recipes into FOOD_NETWORK_INSPECT table """
 
     print "Adding SampleFNRecipe"
 
@@ -15,10 +25,7 @@ def load_recipes():
     # new data and no duplicates
     SampleFNRecipe.query.delete()
 
-
-   # Open JSON file & parse lines
-    with open("../scrapy/recipe_yum/recipe_yum/spiders/all_recipes_jsontest.json") as file:
-        recipe_lines = json.load(file)
+    qty_data = set()
 
     for line in recipe_lines:
         url = line['url']
@@ -35,9 +42,60 @@ def load_recipes():
         category_tags = line['category_tags']
 
         ########################################################################
-        # INGREDIENTS: Populate value as an array
+        # INGREDIENTS: Populate value as an array; split into 2 additional columns
+        # of dict ingredient: qty (converted to grams) & text ingredients without
+        # amounts
+        measure_names = ["cup", "cups", "teaspoon", "teaspoons", "tsp", "tsp.",
+                         "tablespoon", "tablespoons", "tbsp", "tbsp.", "ounce",
+                         "ounces", "oz", "oz.", "package", "pound", "pounds",
+                         "small", "large", "container", "stalk", "stalks", "pinch",
+                         "a pinch", "handful", "a handful", "few", "a few", "to",
+                         "plus", "of", "stick", "sticks", "drop", "drops", "can",
+                         "dash", "pack", "sprig", "sprigs", "lb", "lb.", "bag",
+                         "liter", "bulk", "pieces"]
 
-        ingredients = line['ingredients']
+        descriptors = ["bulk", "store-bought", "finely", "diced", "chopped",
+                       "coarse", "coarsely", "freshly", "sliced", "loose", "of",
+                       "minced", "fresh", "a", "store-bought", "brand"]
+
+        fractions = ["1/2", "1/4", "1/3", "3/4", "2/3", "1/8", "7/8", "1-",
+                     "1/2-", "1/4-", "1/2-inch", "1/4-inch", "8-ounce"]
+
+        # TEXT INGREDIENTS (written as in original text)
+        text_ingredients = line['ingredients']
+
+        # INGREDIENTS NAMES (cleaned of measures, numeric amounts, commentary)
+        if len(line['ingredients']) > 0:
+            ingredients_names = []
+
+            for item in line['ingredients']:
+                item = re.sub(r" ?\([^)]+\)", "", item)
+                item = item.lower().split(" ")
+                for i in item:
+                    if i.isnumeric():
+                        item.remove(i)
+                for i in item:
+                    if i in measure_names:
+                        item.remove(i)
+                for i in item:
+                    if i in descriptors:
+                        item.remove(i)
+                for i in item:
+                    if i in fractions:
+                        item.remove(i)
+                item = " ".join(item).rstrip().encode('utf-8')
+                item = item.split(',')
+                item = item[0]
+                ingredients_names.append(item)
+                qty_data.add(item)
+
+            ingredients_names = Cast(ingredients_names, ARRAY(db.Text))
+
+        else:
+            ingredients_names = Cast(array([]), ARRAY(db.Text))
+
+        # INGREDIENTS QTY ()
+
 
         ########################################################################
         # SPECIAL EQUIPMENT: Populate with null if null; clean formatting where
@@ -133,10 +191,9 @@ def load_recipes():
                     inactive_time = inactive_time + " {} ".format(times[t])
 
 
-
-        # Read CSV data file & insert data
-        # for row in open("../scrapy/recipe_yum/recipe_yum/spiders/all_recipes_0.csv"):
-        #     row = row.rstrip().split(",")
+        ########################################################################
+        # CREATE OBJECT: Declare object, declare all column values, add object
+        # to database, rise & repeat.
 
 
         recipe = SampleFNRecipe(recipe_name=recipe_name,
@@ -145,7 +202,8 @@ def load_recipes():
                                 difficulty=difficulty,
                                 servings=servings,
                                 special_equipment=special_equipment,
-                                ingredients=ingredients,
+                                text_ingredients=text_ingredients,
+                                ingredients_names=ingredients_names,
                                 preparation=preparation,
                                 total_time=total_time,
                                 prep_time=prep_time,
@@ -157,20 +215,56 @@ def load_recipes():
 
         db.session.add(recipe)
 
+    ############################################################################
+    # COMMIT: Commit all changes (objects added) to database.
+
+    db.session.commit()
+    return qty_data
+
+################################################################################
+############################### LOAD INGREDIENTS ###############################
+################################################################################
+def load_ingredients(qty_data):
+    """ Load ingredients into INGREDIENT_ATTRIBUTES table """
+
+    print "Adding Ingredient"
+
+    # Delete all rows in table, so sample table can be created repeatedly with
+    # new data and no duplicates
+    SampleFNRecipe.query.delete()
+
+    for item in qty_data:
+        ingredient_name = item
+        whole_grams = 100
+        calories_per_whole = None
+        carbs_per_whole = None
+        sugar_per_whole = None
+
+        ingredient = Ingredient(ingredient_name=ingredient_name,
+                                whole_grams=whole_grams,
+                                calories_per_whole=calories_per_whole,
+                                carbs_per_whole=carbs_per_whole,
+                                sugar_per_whole=sugar_per_whole)
+
+        db.session.add(ingredient)
+
     db.session.commit()
 
+################################################################################
+############################### HELPER FUNCTIONS ###############################
+################################################################################
 
-def set_val_recipe_id():
-    """Set value for the next recipe_id after seeding database"""
+# def set_val_recipe_id():
+#     """Set value for the next recipe_id after seeding database"""
 
-    # Get the Max user_id in the database
-    result = db.session.query(func.max(SampleFNRecipe.recipe_id)).one()
-    max_id = int(result[0])
+#     # Get the Max user_id in the database
+#     result = db.session.query(func.max(SampleFNRecipe.recipe_id)).one()
+#     max_id = int(result[0])
 
-    # Set the value for the next user_id to be max_id + 1
-    query = "SELECT setval('samplerecipes_recipe_id_seq', :new_id)"
-    db.session.execute(query, {'new_id': max_id + 1})
-    db.session.commit()
+#     # Set the value for the next user_id to be max_id + 1
+#     query = "SELECT setval('samplerecipes_recipe_id_seq', :new_id)"
+#     db.session.execute(query, {'new_id': max_id + 1})
+#     db.session.commit()
 
 
 
@@ -184,5 +278,6 @@ if __name__ == "__main__":
     db.create_all()
 
     # Import different types of data
-    load_recipes()
-    set_val_recipe_id()
+    qty_data = load_recipes()
+    load_ingredients(qty_data)
+    # set_val_recipe_id()

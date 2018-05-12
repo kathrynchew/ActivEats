@@ -16,14 +16,16 @@ class SampleFNRecipe(db.Model):
 
     __tablename__ = "food_network_inspect"
 
-    recipe_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    recipe_id = db.Column(db.Integer, autoincrement=True, primary_key=True, 
+                          nullable=False)
     recipe_name = db.Column(db.Text, nullable=False)
     recipe_author = db.Column(db.Text, nullable=True)
     category_tags = db.Column(db.ARRAY(db.Text), nullable=False)
     difficulty = db.Column(db.Text, nullable=True)
     servings = db.Column(db.Text, nullable=False)
     special_equipment = db.Column(db.Text, nullable=True)
-    ingredients = db.Column(db.ARRAY(db.Text), nullable=False)
+    text_ingredients = db.Column(db.ARRAY(db.Text), nullable=False)
+    ingredients_names = db.Column(db.ARRAY(db.Text), nullable=False)
     preparation = db.Column(db.Text, nullable=False)
     total_time = db.Column(db.Interval, nullable=True)
     prep_time = db.Column(db.Interval, nullable=True)
@@ -39,6 +41,29 @@ class SampleFNRecipe(db.Model):
         """ Representative model for recipe items """
 
         return "<Recipe id={}: {}>".format(self.recipe_id, self.recipe_name)
+
+
+class Ingredient(db.Model):
+    """ Table for attributes of individual ingredients, including 'whole'
+    amounts, with spaces left for nutrient information.
+
+    Has foreign key relationship with a ingredient_amounts middle table (connects
+    to food_network_inspect table"""
+
+    __tablename__ = "ingredient_attributes"
+
+    ingredient_id = db.Column(db.Integer, autoincrement=True, primary_key=True,
+                              nullable=False)
+    ingredient_name = db.Column(db.Text, nullable=False)
+    whole_grams = db.Column(db.Numeric, nullable=False)
+    calories_per_whole = db.Column(db.Numeric, nullable=True)
+
+
+    def __repr__(self):
+        """ Representative model for ingredients """
+
+        return "<Ingredient id={}: {}".format(self.ingredient_id, 
+                                              self.ingredient_name)
 
 
 
