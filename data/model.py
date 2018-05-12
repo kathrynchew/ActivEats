@@ -57,6 +57,8 @@ class Ingredient(db.Model):
     ingredient_name = db.Column(db.Text, nullable=False)
     whole_grams = db.Column(db.Numeric, nullable=False)
     calories_per_whole = db.Column(db.Numeric, nullable=True)
+    carbs_per_whole = db.Column(db.Numeric, nullable=True)
+    sugar_per_whole = db.Column(db.Numeric, nullable=True)
 
 
     def __repr__(self):

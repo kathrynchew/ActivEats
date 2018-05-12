@@ -34,41 +34,24 @@ for line in recipe_lines:
     text_ingredients = line['ingredients']
 
     # INGREDIENTS NAMES (cleaned of measures, numeric amounts, commentary)
-    # if len(line['ingredients']) > 0:
+    if len(line['ingredients']) > 0:
     ingredients_names = []
 
     for item in line['ingredients']:
         item = re.sub(r" ?\([^)]+\)", "", item)
         item = item.lower().split(" ")
-        # for i in item:
-        #     if i.isnumeric():
-        #         item.remove(i)
-        # print item
-        # for i in item:
-        #     if i in measure_names:
-        #         item.remove(i)
-        # print item
-        # for i in item:
-        #     if i in descriptors:
-        #         item.remove(i)
-        # print item
-        # for i in item:
-        #     if i in fractions:
-        #         item.remove(i)
         item = [i for i in item if ((i.isnumeric() is False) and (i not in measure_names and i not in descriptors and i not in fractions))]
         print item
         item = " ".join(item).rstrip().encode('utf-8')
         item = item.split(',')
         item = item[0]
-        print item
         ingredients_names.append(item)
-        # qty_data.add(item)
+        qty_data.add(item)
 
-    # ingredients_names = Cast(ingredients_names, ARRAY(db.Text))
-    print ingredients_names
+    ingredients_names = Cast(ingredients_names, ARRAY(db.Text))
 
-        # else:
-            # ingredients_names = Cast(array([]), ARRAY(db.Text))
+        else:
+            ingredients_names = Cast(array([]), ARRAY(db.Text))
 
 
     # INGREDIENTS QTY
