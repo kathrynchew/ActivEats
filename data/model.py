@@ -16,7 +16,7 @@ class SampleFNRecipe(db.Model):
 
     __tablename__ = "food_network_inspect"
 
-    recipe_id = db.Column(db.Integer, autoincrement=True, primary_key=True, 
+    recipe_id = db.Column(db.Integer, autoincrement=True, primary_key=True,
                           nullable=False)
     recipe_name = db.Column(db.Text, nullable=False)
     recipe_author = db.Column(db.Text, nullable=True)
@@ -35,8 +35,6 @@ class SampleFNRecipe(db.Model):
     photo_url = db.Column(db.Text, nullable=True)
     recipe_url = db.Column(db.Text, nullable=False)
 
-
-
     def __repr__(self):
         """ Representative model for recipe items """
 
@@ -54,7 +52,7 @@ class Ingredient(db.Model):
 
     ingredient_id = db.Column(db.Integer, autoincrement=True, primary_key=True,
                               nullable=False)
-    ingredient_name = db.Column(db.Text, nullable=False)
+    ingredient_name = db.Column(db.Text, nullable=False, unique=True)
     whole_grams = db.Column(db.Numeric, nullable=False)
     calories_per_whole = db.Column(db.Numeric, nullable=True)
     carbs_per_whole = db.Column(db.Numeric, nullable=True)
@@ -64,8 +62,39 @@ class Ingredient(db.Model):
     def __repr__(self):
         """ Representative model for ingredients """
 
-        return "<Ingredient id={}: {}".format(self.ingredient_id, 
+        return "<Ingredient id={}: {}>".format(self.ingredient_id,
                                               self.ingredient_name)
+
+
+class RecipeIngredient(db.Model):
+    """ Middle table connecting recipes with each ingredient they contain;
+    links FOOD_NETWORK_INSPECT table (Foreign Key: recipe_id) to
+    INGREDIENT_ATTRIBUTES table (Foreign Key: ingredient_id) """
+
+    __tablename__ = "recipe_ingredients"
+
+    rec_ing_id = db.Column(db.Integer, autoincrement=True, primary_key=True,
+                           nullable=False)
+    recipe_id = db.Column(db.Integer, db.ForeignKey('food_network_inspect.recipe_id'), nullable=False)
+    recipe_url = db.Column(db.Text, nullable=True),
+    ingredient_id = db.Column(db.Integer, nullable=False),
+    ingredient_name = db.Column(db.Text, db.ForeignKey('ingredient_attributes.ingredient_name'))
+
+    # food_network_inspect = db.relationship("SampleFNRecipe",
+                                           # primaryjoin="food_network_inspect.recipe_url==recipe_ingredients.recipe_url",
+                                           # backref=db.backref("recipe_ingredients",
+                                                              # order_by=recipe_id))
+
+    ingredient_attribute = db.relationship("Ingredient",
+                                           backref=db.backref("recipe_ingredients",
+                                                              order_by=ingredient_id))
+
+
+    def __repr__(self):
+        """ Representative model for recipe-ingredient relationships """
+
+        return "<Recipe_id: {}, Ingredient_id:{}>".format(self.recipe_id,
+                                                          self.ingredient_id)
 
 
 
