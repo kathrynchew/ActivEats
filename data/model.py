@@ -5,8 +5,14 @@ from sqlalchemy.dialects import postgresql
 
 db = SQLAlchemy()
 
+
 ################################################################################
-# MODEL DEFINITIONS
+################################## MAIN TABLES #################################
+################################################################################
+
+
+################################################################################
+# RECIPE TABLE
 
 class SampleFNRecipe(db.Model):
     """ Table for inspecting data directly scraped from Food Network database.
@@ -20,12 +26,12 @@ class SampleFNRecipe(db.Model):
                           nullable=False)
     recipe_name = db.Column(db.Text, nullable=False)
     recipe_author = db.Column(db.Text, nullable=True)
-    category_tags = db.Column(db.ARRAY(db.Text), nullable=False)
+    # category_tags = db.Column(db.ARRAY(db.Text), nullable=False)
     difficulty = db.Column(db.Text, nullable=True)
     servings = db.Column(db.Text, nullable=False)
     special_equipment = db.Column(db.Text, nullable=True)
     text_ingredients = db.Column(db.ARRAY(db.Text), nullable=False)
-    ingredients_names = db.Column(db.ARRAY(db.Text), nullable=False)
+    # ingredients_names = db.Column(db.ARRAY(db.Text), nullable=False)
     preparation = db.Column(db.Text, nullable=False)
     total_time = db.Column(db.Interval, nullable=True)
     prep_time = db.Column(db.Interval, nullable=True)
@@ -40,6 +46,9 @@ class SampleFNRecipe(db.Model):
 
         return "<Recipe id={}: {}>".format(self.recipe_id, self.recipe_name)
 
+
+################################################################################
+# INGREDIENT TABLE
 
 class Ingredient(db.Model):
     """ Table for attributes of individual ingredients, including 'whole'
@@ -65,6 +74,29 @@ class Ingredient(db.Model):
         return "<Ingredient id={}: {}>".format(self.ingredient_id,
                                               self.ingredient_name)
 
+
+################################################################################
+# CATEGORY TAGS TABLE
+
+class Category(db.Model):
+    """ Table for category groupings for each recipe """
+
+    __tablename__ = "category_tags"
+
+    category_id = db.Column(db.Integer, autoincrement=True, primary_key=True,
+                            nullable=False)
+    category_name = db.Column(db.Text, nullable=False, unique=True)
+
+
+    def __repr__(self):
+        """ Representative model for categories """
+
+        return "<Category id={}: {}>".format(self.category_id,
+                                             self.category_name)
+
+################################################################################
+############################## ASSOCIATION TABLES ##############################
+################################################################################
 
 class RecipeIngredient(db.Model):
     """ Middle table connecting recipes with each ingredient they contain;
@@ -97,6 +129,33 @@ class RecipeIngredient(db.Model):
                                                           self.ingredient_id)
 
 
+class RecipeCategory(db.Model):
+    """ Middle table connecting recipes with each category tag that describes
+    them; links FOOD_NETWORK_INSPECT table (Foreign Key: recipe_id) to
+    CATEGORY table (Foreign Key: category_id) """
+
+    __tablename__ = "recipe_categories"
+
+    rec_cat_id = db.Column(db.Integer, autoincrement=True, primary_key=True,
+                           nullable=False)
+    recipe_id = db.Column(db.Integer, db.ForeignKey('food_network_inspect.recipe_id'),
+                          nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('category_tags.category_id'),
+                            nullable=False)
+
+    food_network_inspect = db.relationship("SampleFNRecipe",
+                                           backref=db.backref("recipe_categories",
+                                                              order_by=recipe_id))
+
+    category_tags = db.relationship("Category",
+                                    backref=db.backref("recipe_categories",
+                                                       order_by=category_id))
+
+    def __repr__(self):
+        """ Representative model for recipe-category relationships """
+
+        return "Recipe_id: {}, Category_id:{}>".format(self.recipe_id,
+                                                       self.category_id)
 
 
 ##############################################################################

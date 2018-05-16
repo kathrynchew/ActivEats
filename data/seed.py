@@ -1,7 +1,7 @@
 """ Utility file to clean & seed recipe database from scraped data """
 
 from sqlalchemy import func
-from model import SampleFNRecipe, Ingredient, RecipeIngredient, connect_to_db, db
+from model import SampleFNRecipe, Ingredient, RecipeIngredient, Category, RecipeCategory, connect_to_db, db
 from server import app
 import json
 import re
@@ -28,6 +28,8 @@ def load_recipes():
 
     urls_plus_ingredients = {}
     qty_data = set()
+    urls_plus_categories = {}
+    raw_tags = set()
 
     for line in recipe_lines:
         if line['url'] == "http://www.foodnetwork.com/error-page/500":
@@ -42,9 +44,16 @@ def load_recipes():
 
 
             ########################################################################
-            # CATEGORY TAGS: Populate value as an array
+            # CATEGORY TAGS: Transfer scraped category arrays to a set to return
+            # for further processing in LOAD_TAGS function.
 
-            category_tags = line['category_tags']
+            urls_plus_categories[url] = set()
+
+            for item in line['category_tags']:
+                if len(item) > 0:
+                    raw_tags.add(item)
+                    urls_plus_categories[url].add(item)
+
 
             ########################################################################
             # INGREDIENTS: Populate value as an array; split into 2 additional columns
@@ -85,7 +94,7 @@ def load_recipes():
             urls_plus_ingredients[url] = set()
 
             if len(line['ingredients']) > 0:
-                ingredients_names = []
+                # ingredients_names = []
 
                 for item in line['ingredients']:
                     item = re.sub(r" ?\([^)]+\)", "", item)
@@ -96,15 +105,15 @@ def load_recipes():
                     item = item.split(',')
                     item = item[0]
                     if len(item) > 0:
-                        ingredients_names.append(item)
+                        # ingredients_names.append(item)
                         qty_data.add(item)
                         urls_plus_ingredients[url].add(item)
                         # print recipe_name, ingredients_names
 
-                ingredients_names = Cast(ingredients_names, ARRAY(db.Text))
+                # ingredients_names = Cast(ingredients_names, ARRAY(db.Text))
 
-            else:
-                ingredients_names = Cast(array([]), ARRAY(db.Text))
+            # else:
+                # ingredients_names = Cast(array([]), ARRAY(db.Text))
 
 
             # INGREDIENTS QTY ()
@@ -210,12 +219,12 @@ def load_recipes():
 
             recipe = SampleFNRecipe(recipe_name=recipe_name,
                                     recipe_author=recipe_author,
-                                    category_tags=category_tags,
+                                    # category_tags=category_tags,
                                     difficulty=difficulty,
                                     servings=servings,
                                     special_equipment=special_equipment,
                                     text_ingredients=text_ingredients,
-                                    ingredients_names=ingredients_names,
+                                    # ingredients_names=ingredients_names,
                                     preparation=preparation,
                                     total_time=total_time,
                                     prep_time=prep_time,
@@ -232,7 +241,7 @@ def load_recipes():
     # COMMIT: Commit all changes (objects added) to database.
 
     db.session.commit()
-    return [urls_plus_ingredients, qty_data]
+    return [urls_plus_ingredients, qty_data, urls_plus_categories, raw_tags]
 
 ################################################################################
 ############################### LOAD INGREDIENTS ###############################
@@ -267,9 +276,29 @@ def load_ingredients(qty_data):
 
     db.session.commit()
 
+################################################################################
+################################# LOAD TAGS ####################################
+################################################################################
+def load_tags(raw_tags):
+    """ Load category tags into CATEGORY_TAGS table """
+
+    print "Adding Category Tags"
+
+    # Delete all rows in table, so sample table can be created repeatedly with
+    # new data and no duplicates
+    Category.query.delete()
+
+    for item in raw_tags:
+        category_name = item
+
+        category = Category(category_name=category_name)
+
+        db.session.add(category)
+
+    db.session.commit()
 
 ################################################################################
-############################# ASSOCIATION TABLE ################################
+############################# ASSOCIATION TABLES ###############################
 ################################################################################
 def load_recipe_ingredients(urls_plus_ingredients):
     """ Populate association table of recipes to ingredients in each recipe """
@@ -294,6 +323,28 @@ def load_recipe_ingredients(urls_plus_ingredients):
     db.session.commit()
 
 
+def load_recipe_categories(urls_plus_categories):
+    """ Populate association table of recipes to category tags describing each
+    recipe"""
+
+    print "Adding All Recipe/Category Associations"
+
+    RecipeCategory.query.delete()
+
+    all_recipe_ids = db.session.query(SampleFNRecipe.recipe_id, SampleFNRecipe.recipe_url).all()
+
+    for pair in all_recipe_ids:
+        recipe_url = pair[1]
+        for item in urls_plus_categories[recipe_url]:
+            category_name = item
+            category_id = Category.query.filter_by(category_name=category_name).first().category_id
+
+            recipe_category = RecipeCategory(recipe_id=pair[0],
+                                             category_id=category_id)
+
+            db.session.add(recipe_category)
+
+    db.session.commit()
 
 
 ################################################################################
@@ -324,7 +375,9 @@ if __name__ == "__main__":
     db.create_all()
 
     # Import different types of data
-    urls_plus_ingredients, qty_data = load_recipes()
+    urls_plus_ingredients, qty_data, urls_plus_categories, raw_tags = load_recipes()
     load_ingredients(qty_data)
+    load_tags(raw_tags)
     load_recipe_ingredients(urls_plus_ingredients)
+    load_recipe_categories(urls_plus_categories)
     # set_val_recipe_id()
