@@ -27,7 +27,7 @@ class SampleFNRecipe(db.Model):
     recipe_name = db.Column(db.Text, nullable=False)
     recipe_author = db.Column(db.Text, nullable=True)
     # category_tags = db.Column(db.ARRAY(db.Text), nullable=False)
-    difficulty = db.Column(db.Text, nullable=True)
+    # difficulty = db.Column(db.Text, nullable=True)
     servings = db.Column(db.Text, nullable=False)
     special_equipment = db.Column(db.Text, nullable=True)
     text_ingredients = db.Column(db.ARRAY(db.Text), nullable=False)
@@ -94,6 +94,24 @@ class Category(db.Model):
         return "<Category id={}: {}>".format(self.category_id,
                                              self.category_name)
 
+
+################################################################################
+# RECIPE DIFFICULTY TABLE
+
+class Difficulty(db.Model):
+    """ Table for difficulty levels of recipe preparation """
+
+    __tablename__ = "difficulty_level"
+
+    difficulty_id = db.Column(db.Integer, autoincrement=True, primary_key=True,
+                              nullable=False)
+    difficulty_level = db.Column(db.Text, nullable=False, unique=True)
+
+    def __repr__(self):
+        """ Representative model for difficulty levels """
+
+        return "<Difficulty level: {}>".format(self.difficulty_level)
+
 ################################################################################
 ############################## ASSOCIATION TABLES ##############################
 ################################################################################
@@ -156,6 +174,34 @@ class RecipeCategory(db.Model):
 
         return "Recipe_id: {}, Category_id:{}>".format(self.recipe_id,
                                                        self.category_id)
+
+
+class RecipeDifficulty(db.Model):
+    """ Middle table connecting recipes with their respective difficulty level;
+    links FOOD_NETWORK_INSPECT table (Foreign Key: recipe_id) to DIFFICULTY
+    table (Foreign Key: difficulty_id) """
+
+    __tablename__ = "recipe_difficulty"
+
+    rec_dif_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    recipe_id = db.Column(db.Integer, db.ForeignKey('food_network_inspect.recipe_id'),
+                          nullable=False)
+    difficulty_id = db.Column(db.Integer, db.ForeignKey('difficulty_level.difficulty_id'),
+                              nullable=False)
+
+    food_network_inspect = db.relationship("SampleFNRecipe",
+                                           backref=db.backref("recipe_difficulty",
+                                                              order_by=recipe_id))
+
+    category_tags = db.relationship("Difficulty",
+                                    backref=db.backref("recipe_difficulty",
+                                                       order_by=difficulty_id))
+
+    def __repr__(self):
+        """ Representative model for recipe-difficulty relationships """
+
+        return "<Recipe_id: {}, Difficulty_id: {}>".format(self.recipe_id,
+                                                           self.difficulty_id)
 
 
 ##############################################################################

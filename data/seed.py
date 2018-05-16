@@ -1,7 +1,7 @@
 """ Utility file to clean & seed recipe database from scraped data """
 
 from sqlalchemy import func
-from model import SampleFNRecipe, Ingredient, RecipeIngredient, Category, RecipeCategory, connect_to_db, db
+from model import SampleFNRecipe, Ingredient, RecipeIngredient, Category, RecipeCategory, Difficulty, RecipeDifficulty, connect_to_db, db
 from server import app
 import json
 import re
@@ -30,13 +30,15 @@ def load_recipes():
     qty_data = set()
     urls_plus_categories = {}
     raw_tags = set()
+    urls_plus_difficulty = {}
+    difficulty_types = set()
 
     for line in recipe_lines:
         if line['url'] == "http://www.foodnetwork.com/error-page/500":
             pass
         else:
             url = line['url']
-            difficulty = line['difficulty']
+            difficulty = "".join(line['difficulty'])
             recipe_name = line['recipe_name']
             servings = line['servings']
             recipe_author = line['recipe_author']
@@ -53,6 +55,14 @@ def load_recipes():
                 if len(item) > 0:
                     raw_tags.add(item)
                     urls_plus_categories[url].add(item)
+
+            ########################################################################
+            # DIFFICULTY LEVELS: Transfer scraped difficulty strings to a set to return
+            # for further processing in LOAD_DIFFICULTY function.
+
+            if difficulty != 'N/A':
+                urls_plus_difficulty[url] = difficulty
+                difficulty_types.add(difficulty)
 
 
             ########################################################################
@@ -220,7 +230,7 @@ def load_recipes():
             recipe = SampleFNRecipe(recipe_name=recipe_name,
                                     recipe_author=recipe_author,
                                     # category_tags=category_tags,
-                                    difficulty=difficulty,
+                                    # difficulty=difficulty,
                                     servings=servings,
                                     special_equipment=special_equipment,
                                     text_ingredients=text_ingredients,
@@ -241,7 +251,11 @@ def load_recipes():
     # COMMIT: Commit all changes (objects added) to database.
 
     db.session.commit()
-    return [urls_plus_ingredients, qty_data, urls_plus_categories, raw_tags]
+
+    # print urls_plus_difficulty
+
+    return [urls_plus_ingredients, qty_data, urls_plus_categories, raw_tags,
+            urls_plus_difficulty, difficulty_types]
 
 ################################################################################
 ############################### LOAD INGREDIENTS ###############################
@@ -249,7 +263,7 @@ def load_recipes():
 def load_ingredients(qty_data):
     """ Load ingredients into INGREDIENT_ATTRIBUTES table """
 
-    print "Adding Ingredient"
+    print "Adding Ingredients"
 
     # Delete all rows in table, so sample table can be created repeatedly with
     # new data and no duplicates
@@ -297,9 +311,38 @@ def load_tags(raw_tags):
 
     db.session.commit()
 
+
+################################################################################
+################################ LOAD DIFFICULTY ###############################
+################################################################################
+def load_difficulty(difficulty_types):
+    """ Load difficulty levels into DIFFICULTY_LEVELS table """
+
+    print "Adding Difficulty Level Data"
+
+    # Delete all rows in table, so sample table can be created repeatedly with
+    # new data and no duplicates
+    Difficulty.query.delete()
+
+    for item in difficulty_types:
+        difficulty_level = item
+
+        level = Difficulty(difficulty_level=difficulty_level)
+
+        db.session.add(level)
+
+    db.session.commit()
+
+
 ################################################################################
 ############################# ASSOCIATION TABLES ###############################
 ################################################################################
+
+# Query all recipe_id entries from FOOD_NETWORK_INSPECT table for reference in
+# constructing all association tables
+# all_recipe_ids = db.session.query(SampleFNRecipe.recipe_id, SampleFNRecipe.recipe_url).all()
+
+# Build association tables
 def load_recipe_ingredients(urls_plus_ingredients):
     """ Populate association table of recipes to ingredients in each recipe """
 
@@ -325,7 +368,7 @@ def load_recipe_ingredients(urls_plus_ingredients):
 
 def load_recipe_categories(urls_plus_categories):
     """ Populate association table of recipes to category tags describing each
-    recipe"""
+    recipe """
 
     print "Adding All Recipe/Category Associations"
 
@@ -343,6 +386,31 @@ def load_recipe_categories(urls_plus_categories):
                                              category_id=category_id)
 
             db.session.add(recipe_category)
+
+    db.session.commit()
+
+
+def load_recipe_difficulty(urls_plus_difficulty):
+    """ Populate association table of recipe to difficulty level of preparing
+    that recipe """
+
+    print "Adding All Recipe/Difficulty Level Associations"
+
+    RecipeDifficulty.query.delete()
+
+    all_recipe_ids = db.session.query(SampleFNRecipe.recipe_id, SampleFNRecipe.recipe_url).all()
+
+    for pair in all_recipe_ids:
+        recipe_url = pair[1]
+        if recipe_url in urls_plus_difficulty:
+            for item in urls_plus_difficulty[recipe_url]:
+                difficulty_level = item
+                difficulty_id = Difficulty.query.filter_by(difficulty_level=difficulty_level).first().difficulty_id
+
+                recipe_difficulty = RecipeDifficulty(recipe_id=pair[0],
+                                                     difficulty_id=difficulty_id)
+
+                db.session.add(recipe_difficulty)
 
     db.session.commit()
 
@@ -375,9 +443,11 @@ if __name__ == "__main__":
     db.create_all()
 
     # Import different types of data
-    urls_plus_ingredients, qty_data, urls_plus_categories, raw_tags = load_recipes()
+    urls_plus_ingredients, qty_data, urls_plus_categories, raw_tags, urls_plus_difficulty, difficulty_types = load_recipes()
     load_ingredients(qty_data)
     load_tags(raw_tags)
+    load_difficulty(difficulty_types)
     load_recipe_ingredients(urls_plus_ingredients)
     load_recipe_categories(urls_plus_categories)
+    load_recipe_difficulty(urls_plus_difficulty)
     # set_val_recipe_id()
