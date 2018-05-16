@@ -272,7 +272,7 @@ def load_ingredients(qty_data):
 ############################# ASSOCIATION TABLE ################################
 ################################################################################
 def load_recipe_ingredients(urls_plus_ingredients):
-    """ Populate association table """
+    """ Populate association table of recipes to ingredients in each recipe """
 
     print "Adding All Recipe/Ingredient Associations"
 
@@ -284,9 +284,10 @@ def load_recipe_ingredients(urls_plus_ingredients):
         recipe_url = pair[1]
         for item in urls_plus_ingredients[recipe_url]:
             ingredient_name = item
+            ingredient_id = Ingredient.query.filter_by(ingredient_name=ingredient_name).first().ingredient_id
 
             recipe_ingredient = RecipeIngredient(recipe_id=pair[0],
-                                                 ingredient_name=ingredient_name)
+                                                 ingredient_id=ingredient_id)
 
             db.session.add(recipe_ingredient)
 

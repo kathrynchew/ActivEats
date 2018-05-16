@@ -76,14 +76,14 @@ class RecipeIngredient(db.Model):
     rec_ing_id = db.Column(db.Integer, autoincrement=True, primary_key=True,
                            nullable=False)
     recipe_id = db.Column(db.Integer, db.ForeignKey('food_network_inspect.recipe_id'), nullable=False)
-    recipe_url = db.Column(db.Text, nullable=True),
-    ingredient_id = db.Column(db.Integer, nullable=False),
-    ingredient_name = db.Column(db.Text, db.ForeignKey('ingredient_attributes.ingredient_name'))
+    # recipe_url = db.Column(db.Text, nullable=True)
+    ingredient_id = db.Column(db.Integer, db.ForeignKey('ingredient_attributes.ingredient_id'), nullable=False)
+    # ingredient_name = db.Column(db.Text, nullable=True)
 
-    # food_network_inspect = db.relationship("SampleFNRecipe",
+    food_network_inspect = db.relationship("SampleFNRecipe",
                                            # primaryjoin="food_network_inspect.recipe_url==recipe_ingredients.recipe_url",
-                                           # backref=db.backref("recipe_ingredients",
-                                                              # order_by=recipe_id))
+                                           backref=db.backref("recipe_ingredients",
+                                                              order_by=recipe_id))
 
     ingredient_attribute = db.relationship("Ingredient",
                                            backref=db.backref("recipe_ingredients",
