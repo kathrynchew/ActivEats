@@ -351,7 +351,7 @@ def load_tags(raw_tags):
 ################################################################################
 ################################ LOAD DIFFICULTY ###############################
 ################################################################################
-def load_difficulty(difficulty_types):
+def load_difficulty():
     """ Load difficulty levels into DIFFICULTY_LEVELS table """
 
     print "Adding Difficulty Level Data"
@@ -360,7 +360,7 @@ def load_difficulty(difficulty_types):
     # new data and no duplicates
     # Difficulty.query.delete()
 
-    print difficulty_types
+    # print difficulty_types
 
     # for item in difficulty_types:
     #     difficulty_level = item
@@ -370,9 +370,9 @@ def load_difficulty(difficulty_types):
     types = ['Easy', 'Intermediate', 'Difficult']
 
     for item in types:
-        difficulty_level = item
+        # difficulty_level = item
 
-        level = Difficulty(difficulty_level=difficulty_level)
+        level = Difficulty(difficulty_level=item)
 
         db.session.add(level)
         print level
@@ -489,11 +489,14 @@ if __name__ == "__main__":
     db.create_all()
 
     # Import different types of data
-    urls_plus_ingredients, qty_data, urls_plus_categories, raw_tags, urls_plus_difficulty, difficulty_types = load_recipes()
-    load_ingredients(qty_data)
-    load_tags(raw_tags)
-    load_difficulty(difficulty_types)
-    load_recipe_ingredients(urls_plus_ingredients)
-    load_recipe_categories(urls_plus_categories)
-    load_recipe_difficulty(urls_plus_difficulty)
+    # urls_plus_ingredients, qty_data, urls_plus_categories, raw_tags, urls_plus_difficulty, difficulty_types = load_recipes()
+    # load_ingredients(qty_data)
+    # load_tags(raw_tags)
+    # load_difficulty(difficulty_types)
+    # load_recipe_ingredients(urls_plus_ingredients)
+    # load_recipe_categories(urls_plus_categories)
+    # load_recipe_difficulty(urls_plus_difficulty)
+
+    load_difficulty()
+
     # set_val_recipe_id()
