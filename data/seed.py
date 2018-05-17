@@ -10,7 +10,7 @@ from sqlalchemy.sql.functions import Cast
 
 
 # Open JSON file & parse lines
-with open("../scrapy/recipe_yum/recipe_yum/spiders/all_recipes_jsontest.json") as file:
+with open("recipe_files/all_recipes_jsontest.json") as file:
     recipe_lines = json.load(file)
 
 ################################################################################
