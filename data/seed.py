@@ -40,7 +40,6 @@ def load_recipes():
             url = line['url']
             difficulty = "".join(line['difficulty'])
             recipe_name = line['recipe_name']
-            servings = line['servings']
             recipe_author = line['recipe_author']
             photo_url = line['photo_url']
 
@@ -63,6 +62,41 @@ def load_recipes():
             if difficulty != 'N/A':
                 urls_plus_difficulty[url] = difficulty
                 difficulty_types.add(difficulty)
+
+
+            ########################################################################
+            # SERVINGS: Split servings strings into 2 columns: servings_num (integer)
+            # and servings_unit (text of serving unit/quantity)
+
+            servings = line['servings']
+            accepted_units = ['serving', 'servings', 'piece', 'pieces', 'cup', 'cups',
+                              'dozen', 'square', 'squares', 'quart', 'quarts', 'portion',
+                              'portions', 'pizza', 'pizzas', 'sandwich', 'sandwiches',
+                              'cookie', 'cookies', 'pancake', 'panakes', 'bun', 'buns',
+                              'truffle', 'truffles', 'burger', 'burgers', 'hors',
+                              "d'oeuvres", 'pint', 'pints', 'cake', 'cakes', 'pie',
+                              'pies']
+
+            if servings == 'N/A':
+                servings_unit = None
+                servings_num = None
+
+            else:
+                servings = re.sub(r" ?\([^)]+\)", "", servings)
+                num = [i for i in servings.split() if i.isnumeric()] 
+                unit = [i for i in servings.lower().split() if (i.isnumeric() is False) and (i in accepted_units)]
+
+                if num == []:
+                    servings_num = None
+                else:
+                    servings_num = num[0]
+
+                if unit == []:
+                    servings_unit = None
+                else:
+                    servings_unit = " ".join(unit)
+
+            text_servings = line['servings']
 
 
             ########################################################################
@@ -231,7 +265,9 @@ def load_recipes():
                                     recipe_author=recipe_author,
                                     # category_tags=category_tags,
                                     # difficulty=difficulty,
-                                    servings=servings,
+                                    servings_num=servings_num,
+                                    servings_unit=servings_unit,
+                                    text_servings=text_servings,
                                     special_equipment=special_equipment,
                                     text_ingredients=text_ingredients,
                                     # ingredients_names=ingredients_names,
@@ -267,7 +303,7 @@ def load_ingredients(qty_data):
 
     # Delete all rows in table, so sample table can be created repeatedly with
     # new data and no duplicates
-    Ingredient.query.delete()
+    # Ingredient.query.delete()
 
     for item in qty_data:
         if len(item) == 0:
@@ -300,7 +336,7 @@ def load_tags(raw_tags):
 
     # Delete all rows in table, so sample table can be created repeatedly with
     # new data and no duplicates
-    Category.query.delete()
+    # Category.query.delete()
 
     for item in raw_tags:
         category_name = item
@@ -322,14 +358,24 @@ def load_difficulty(difficulty_types):
 
     # Delete all rows in table, so sample table can be created repeatedly with
     # new data and no duplicates
-    Difficulty.query.delete()
+    # Difficulty.query.delete()
 
-    for item in difficulty_types:
+    print difficulty_types
+
+    # for item in difficulty_types:
+    #     difficulty_level = item
+
+    #     level = Difficulty(difficulty_level=difficulty_level)
+
+    types = ['Easy', 'Intermediate', 'Difficult']
+
+    for item in types:
         difficulty_level = item
 
         level = Difficulty(difficulty_level=difficulty_level)
 
         db.session.add(level)
+        print level
 
     db.session.commit()
 
@@ -348,7 +394,7 @@ def load_recipe_ingredients(urls_plus_ingredients):
 
     print "Adding All Recipe/Ingredient Associations"
 
-    RecipeIngredient.query.delete()
+    # RecipeIngredient.query.delete()
 
     all_recipe_ids = db.session.query(SampleFNRecipe.recipe_id, SampleFNRecipe.recipe_url).all()
 
@@ -372,7 +418,7 @@ def load_recipe_categories(urls_plus_categories):
 
     print "Adding All Recipe/Category Associations"
 
-    RecipeCategory.query.delete()
+    # RecipeCategory.query.delete()
 
     all_recipe_ids = db.session.query(SampleFNRecipe.recipe_id, SampleFNRecipe.recipe_url).all()
 
@@ -396,9 +442,9 @@ def load_recipe_difficulty(urls_plus_difficulty):
 
     print "Adding All Recipe/Difficulty Level Associations"
 
-    RecipeDifficulty.query.delete()
+    # RecipeDifficulty.query.delete()
 
-    all_recipe_ids = db.session.query(SampleFNRecipe.recipe_id, SampleFNRecipe.recipe_url).all()
+    all_recipe_ids = db.session.query(SampleFNRecipe.recipe_id, SampleFNRecipe.recipe_url).order_by(SampleFNRecipe.recipe_id).all()
 
     for pair in all_recipe_ids:
         recipe_url = pair[1]
