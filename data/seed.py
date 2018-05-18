@@ -138,26 +138,17 @@ def load_recipes():
             urls_plus_ingredients[url] = set()
 
             if len(line['ingredients']) > 0:
-                # ingredients_names = []
 
                 for item in line['ingredients']:
                     item = re.sub(r" ?\([^)]+\)", "", item)
                     item = item.lower().split(" ")
                     item = [i for i in item if ((i.isnumeric() is False) and (len(i) > 0) and (i not in measure_names and i not in descriptors and i not in fractions))]
-                    # print item
                     item = " ".join(item).rstrip().encode('utf-8')
                     item = item.split(',')
                     item = item[0]
                     if len(item) > 0:
-                        # ingredients_names.append(item)
                         qty_data.add(item)
                         urls_plus_ingredients[url].add(item)
-                        # print recipe_name, ingredients_names
-
-                # ingredients_names = Cast(ingredients_names, ARRAY(db.Text))
-
-            # else:
-                # ingredients_names = Cast(array([]), ARRAY(db.Text))
 
 
             # INGREDIENTS QTY ()
@@ -259,18 +250,14 @@ def load_recipes():
             ########################################################################
             # CREATE OBJECT: Declare object, declare all column values, add object
             # to database, rise & repeat.
-            # import pdb; pdb.set_trace()
 
             recipe = SampleFNRecipe(recipe_name=recipe_name,
                                     recipe_author=recipe_author,
-                                    # category_tags=category_tags,
-                                    # difficulty=difficulty,
                                     servings_num=servings_num,
                                     servings_unit=servings_unit,
                                     text_servings=text_servings,
                                     special_equipment=special_equipment,
                                     text_ingredients=text_ingredients,
-                                    # ingredients_names=ingredients_names,
                                     preparation=preparation,
                                     total_time=total_time,
                                     prep_time=prep_time,
@@ -281,7 +268,6 @@ def load_recipes():
                                     recipe_url=url)
 
             db.session.add(recipe)
-            # print recipe
 
     ############################################################################
     # COMMIT: Commit all changes (objects added) to database.
@@ -322,7 +308,6 @@ def load_ingredients(qty_data):
                                     sugar_per_whole=sugar_per_whole)
 
             db.session.add(ingredient)
-            # print ingredient
 
     db.session.commit()
 
@@ -360,19 +345,10 @@ def load_difficulty(difficulty_types):
     # new data and no duplicates
     # Difficulty.query.delete()
 
-    print difficulty_types
-
     for item in difficulty_types:
         difficulty_level = item
 
         level = Difficulty(difficulty_level=difficulty_level)
-
-    # types = ['Easy', 'Intermediate', 'Difficult']
-
-    # for item in types:
-        # difficulty_level = item
-
-        # level = Difficulty(difficulty_level=item)
 
         db.session.add(level)
         print level
@@ -386,7 +362,6 @@ def load_difficulty(difficulty_types):
 
 # Query all recipe_id entries from FOOD_NETWORK_INSPECT table for reference in
 # constructing all association tables
-# all_recipe_ids = db.session.query(SampleFNRecipe.recipe_id, SampleFNRecipe.recipe_url).all()
 
 # Build association tables
 def load_recipe_ingredients(urls_plus_ingredients):
@@ -495,7 +470,5 @@ if __name__ == "__main__":
     load_recipe_ingredients(urls_plus_ingredients)
     load_recipe_categories(urls_plus_categories)
     load_recipe_difficulty(urls_plus_difficulty)
-
-    # load_difficulty()
 
     # set_val_recipe_id()
