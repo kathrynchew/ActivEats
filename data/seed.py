@@ -351,7 +351,7 @@ def load_tags(raw_tags):
 ################################################################################
 ################################ LOAD DIFFICULTY ###############################
 ################################################################################
-def load_difficulty():
+def load_difficulty(difficulty_types):
     """ Load difficulty levels into DIFFICULTY_LEVELS table """
 
     print "Adding Difficulty Level Data"
@@ -360,19 +360,19 @@ def load_difficulty():
     # new data and no duplicates
     # Difficulty.query.delete()
 
-    # print difficulty_types
+    print difficulty_types
 
-    # for item in difficulty_types:
-    #     difficulty_level = item
+    for item in difficulty_types:
+        difficulty_level = item
 
-    #     level = Difficulty(difficulty_level=difficulty_level)
+        level = Difficulty(difficulty_level=difficulty_level)
 
-    types = ['Easy', 'Intermediate', 'Difficult']
+    # types = ['Easy', 'Intermediate', 'Difficult']
 
-    for item in types:
+    # for item in types:
         # difficulty_level = item
 
-        level = Difficulty(difficulty_level=item)
+        # level = Difficulty(difficulty_level=item)
 
         db.session.add(level)
         print level
@@ -449,14 +449,13 @@ def load_recipe_difficulty(urls_plus_difficulty):
     for pair in all_recipe_ids:
         recipe_url = pair[1]
         if recipe_url in urls_plus_difficulty:
-            for item in urls_plus_difficulty[recipe_url]:
-                difficulty_level = item
-                difficulty_id = Difficulty.query.filter_by(difficulty_level=difficulty_level).first().difficulty_id
+            difficulty_level = urls_plus_difficulty[recipe_url]
+            difficulty_id = Difficulty.query.filter_by(difficulty_level=difficulty_level).first().difficulty_id
 
-                recipe_difficulty = RecipeDifficulty(recipe_id=pair[0],
-                                                     difficulty_id=difficulty_id)
+            recipe_difficulty = RecipeDifficulty(recipe_id=pair[0],
+                                                 difficulty_id=difficulty_id)
 
-                db.session.add(recipe_difficulty)
+            db.session.add(recipe_difficulty)
 
     db.session.commit()
 
@@ -489,14 +488,14 @@ if __name__ == "__main__":
     db.create_all()
 
     # Import different types of data
-    # urls_plus_ingredients, qty_data, urls_plus_categories, raw_tags, urls_plus_difficulty, difficulty_types = load_recipes()
-    # load_ingredients(qty_data)
-    # load_tags(raw_tags)
-    # load_difficulty(difficulty_types)
-    # load_recipe_ingredients(urls_plus_ingredients)
-    # load_recipe_categories(urls_plus_categories)
-    # load_recipe_difficulty(urls_plus_difficulty)
+    urls_plus_ingredients, qty_data, urls_plus_categories, raw_tags, urls_plus_difficulty, difficulty_types = load_recipes()
+    load_ingredients(qty_data)
+    load_tags(raw_tags)
+    load_difficulty(difficulty_types)
+    load_recipe_ingredients(urls_plus_ingredients)
+    load_recipe_categories(urls_plus_categories)
+    load_recipe_difficulty(urls_plus_difficulty)
 
-    load_difficulty()
+    # load_difficulty()
 
     # set_val_recipe_id()
