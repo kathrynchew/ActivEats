@@ -5,7 +5,7 @@ from model import SampleFNRecipe, Ingredient, RecipeIngredient, Category, Recipe
 from server import app
 import json
 import re
-from sqlalchemy.dialects.postgresql import array, ARRAY
+from sqlalchemy.dialects.postgresql import array, ARRAY, JSON
 from sqlalchemy.sql.functions import Cast
 
 
@@ -131,11 +131,29 @@ def load_recipes():
                              "1/2-ounce", "1/o8-inch-think", "2-2", "4-ounces",
                              "2-1", "14-ounce", "1/4-ounce"])
 
+            gram_conversions = {"teaspoon": 4.2,
+                                "tablespoon": 14.3,
+                                "cup": 340,
+                                "ounce": 28.3,
+                                "quart": 946.4,
+                                "pound": 453.6
+                                }
+
+            fraction_conversions = {"1/2": 0.5,
+                                    "1/4": 0.25,
+                                    "3/4": 0.75,
+                                    "1/3": 0.33,
+                                    "2/3": 0.66,
+                                    "1/8": 0.12,
+                                    "7/8": 0.87
+                                    }
+
             # TEXT INGREDIENTS (written as in original text)
             text_ingredients = line['ingredients']
 
             # INGREDIENTS NAMES (cleaned of measures, numeric amounts, commentary)
             urls_plus_ingredients[url] = set()
+            ingredient_amounts = {}
 
             if len(line['ingredients']) > 0:
 
@@ -150,8 +168,10 @@ def load_recipes():
                         qty_data.add(item)
                         urls_plus_ingredients[url].add(item)
 
-
             # INGREDIENTS QTY ()
+                        if item not in ingredient_amounts:
+                            ingredient_amounts[item] = 1
+
 
 
             ########################################################################
@@ -258,6 +278,7 @@ def load_recipes():
                                     text_servings=text_servings,
                                     special_equipment=special_equipment,
                                     text_ingredients=text_ingredients,
+                                    ingredient_amounts=ingredient_amounts,
                                     preparation=preparation,
                                     total_time=total_time,
                                     prep_time=prep_time,
@@ -351,7 +372,6 @@ def load_difficulty(difficulty_types):
         level = Difficulty(difficulty_level=difficulty_level)
 
         db.session.add(level)
-        print level
 
     db.session.commit()
 

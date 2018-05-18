@@ -33,7 +33,7 @@ class SampleFNRecipe(db.Model):
     text_servings = db.Column(db.Text, nullable=True)
     special_equipment = db.Column(db.Text, nullable=True)
     text_ingredients = db.Column(db.ARRAY(db.Text), nullable=False)
-    # ingredients_names = db.Column(db.ARRAY(db.Text), nullable=False)
+    ingredient_amounts = db.Column(db.JSON, nullable=True)
     preparation = db.Column(db.Text, nullable=False)
     total_time = db.Column(db.Interval, nullable=True)
     prep_time = db.Column(db.Interval, nullable=True)
