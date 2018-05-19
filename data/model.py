@@ -87,6 +87,7 @@ class Category(db.Model):
     category_id = db.Column(db.Integer, autoincrement=True, primary_key=True,
                             nullable=False)
     category_name = db.Column(db.Text, nullable=False, unique=True)
+    is_preference = db.Column(db.Boolean, nullable=True)
 
 
     def __repr__(self):
@@ -203,6 +204,98 @@ class RecipeDifficulty(db.Model):
 
         return "<Recipe_id: {}, Difficulty_id: {}>".format(self.recipe_id,
                                                            self.difficulty_id)
+
+################################################################################
+################################## USER TABLES #################################
+################################################################################
+
+class User(db.Model):
+    """ Table for individual users """
+
+    __tablename__ = "users"
+
+    user_id = db.Column(db.Integer, autoincrement=True, primary_key=True,
+                        nullable=False)
+    username = db.Column(db.Text, nullable=False)
+    password = db.Column(db.Text, nullable=False)
+    email = db.Column(db.Text, nullable=False)
+
+    preferences = db.relationship("UserPreference",
+                                  backref=db.backref("users",
+                                                     order_by=user_id))
+
+    collections = db.relationship("Collection",
+                                  backref=db.backref("users",
+                                                     order_by=user_id))
+
+    def __repr__(self):
+        """ Representative model for user objects """
+
+        return "<User id: {}, Username: {}>".format(self.user_id,
+                                                    self.username)
+
+class UserPreference(db.Model):
+    """ Association table for User dietary preference/category associations
+    (category_tags.is_preference == True) """
+
+    __tablename__ = "user_preferences"
+
+    user_pref_id = db.Column(db.Integer, autoincrement=True, primary_key=True,
+                             nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
+                        nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('category_tags.category_id'),
+                            nullable=False)
+
+    user = db.relationship("User",
+                           backref=db.backref("user_preferences",
+                                              order_by=user_id))
+
+    category = db.relationship("Category",
+                               backref=db.backref("user_preferences",
+                                                  order_by=category_id))
+
+    def __repr__(self):
+        """ Representative model for user/dietary preference associations """
+
+        return "<Preference id: {}, User id: {}>".format(self.user_pref_id,
+                                                         self.user_id)
+
+
+class Collection(db.Model):
+    """ Table for collecting all recipes served to a given user sorted by date
+    and groupings of the set of other recipes for the same week's meal plan """
+
+    __tablename__ = "user_collections"
+
+    user_col_id = db.Column(db.Integer, autoincrement=True, primary_key=True,
+                            nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
+                        nullable=False)
+    assigned_date = db.Column(db.Date, nullable=False)
+    set_number = db.Column(db.Integer, nullable=False)
+    set_day = db.Column(db.Integer, nullable=False)
+    meal_type = db.Column(db.Text, nullable=False)
+    recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.recipe_id'),
+                          nullable=False)
+
+    recipe = db.relationship("Recipe",
+                             backref=db.backref("user_collections",
+                                                order_by=user_col_id))
+
+    user = db.relationship("User",
+                           backref=db.backref("user_collections",
+                                              order_by=user_col_id))
+
+    def __repr__(self):
+        """ Representative model for recipe objects in user collections of
+        recipes """
+
+        return "<Id: {} -- set #{}, day #{}: {}>".format(self.user_col_id,
+                                                         self.set_number,
+                                                         self.set_day,
+                                                         self.meal_type)
+
 
 
 ##############################################################################

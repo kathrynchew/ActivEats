@@ -89,3 +89,13 @@ accepted_measures = {"teaspoon": "teaspoon",
                      "lb": "pound",
                      "lb.": "pound",
                      }
+
+# CATEGORY PREFERENCES: Names of category tags that are also user dietary preferences
+
+category_preferences = ["Low Calorie", "Gluten Free", "Vegetarian", "Low-Carb",
+                        "Vegan"]
+
+# Tags for later expansion of dietary preferences
+# category_preferences = ["Low Calorie", "Heart-Healthy", "Gluten Free",
+#                         "Vegetarian", "Low-Cholesterol", "Low-Carb", "Low-Fat",
+#                         "Vegan"]

@@ -1,14 +1,14 @@
 """ Utility file to clean & seed recipe database from scraped data """
 
 from sqlalchemy import func
-from model import Recipe, Ingredient, RecipeIngredient, Category, RecipeCategory, Difficulty, RecipeDifficulty, connect_to_db, db
+from model import Recipe, Ingredient, RecipeIngredient, Category, RecipeCategory, Difficulty, RecipeDifficulty, User, UserPreference, Collection, connect_to_db, db
 from server import app
 import json
 import re
 from unicodedata import numeric
 from sqlalchemy.dialects.postgresql import array, ARRAY, JSON
 from sqlalchemy.sql.functions import Cast
-from data_cleaning_sets import measure_names, descriptors, fractions, gram_conversions, fraction_conversions, accepted_units, accepted_measures
+from data_cleaning_sets import measure_names, descriptors, fractions, gram_conversions, fraction_conversions, accepted_units, accepted_measures, category_preferences
 
 
 # Open JSON file & parse lines
@@ -335,7 +335,13 @@ def load_tags(raw_tags):
     for item in raw_tags:
         category_name = item
 
-        category = Category(category_name=category_name)
+        if item in category_preferences:
+            is_preference = True
+        else:
+            is_preference = False
+
+        category = Category(category_name=category_name,
+                            is_preference=is_preference)
 
         db.session.add(category)
 
