@@ -40,7 +40,8 @@ fraction_conversions = {"1/2": 0.5,
                         "1/3": 0.33,
                         "2/3": 0.66,
                         "1/8": 0.12,
-                        "7/8": 0.87
+                        "7/8": 0.87,
+                        u'1\xbd': 1.5
                         }
 
 accepted_units = ['serving', 'servings', 'piece', 'pieces', 'cup', 'cups',

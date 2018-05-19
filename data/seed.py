@@ -111,10 +111,17 @@ def load_recipes():
                     item = re.sub(r" ?\([^)]+\)", "", item)
                     item = item.lower().split(" ")
                     print item
-                    amt = [i for i in item if i.isnumeric()]
+                    amt = [i for i in item if i.isnumeric() or i in fraction_conversions]
 
+                    print amt
                     if len(amt) > 0:
-                        amt = amt[0]
+                        if amt[0] in fraction_conversions:
+                            amt = [fraction_conversions[amt[0]]]
+                        if len(amt) > 1:
+                            if amt[1] in fraction_conversions:
+                                amt = [float(amt[0]) + fraction_conversions[amt[1]]]
+                            else:
+                                amt = amt[:1]
                     else:
                         amt = None
 
@@ -140,12 +147,12 @@ def load_recipes():
                             if amt is not None and len(amt) > 0:
                                 if unit is not None:
                                     amt = amt[0]
-                                    if not amt.isdigit():
+                                    if type(amt) != float and not amt.isdigit():
                                         amt = numeric(amt)
                                     ingredient_amounts[item] = float(amt) * gram_conversions[unit]
                                 else:
                                     amt = amt[0]
-                                    if not amt.isdigit():
+                                    if type(amt) != float and not amt.isdigit():
                                         amt = numeric(amt)
                                     ingredient_amounts[item] = amt
                             else:
