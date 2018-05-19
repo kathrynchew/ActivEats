@@ -5,9 +5,10 @@ from model import SampleFNRecipe, Ingredient, RecipeIngredient, Category, Recipe
 from server import app
 import json
 import re
+from unicodedata import numeric
 from sqlalchemy.dialects.postgresql import array, ARRAY, JSON
 from sqlalchemy.sql.functions import Cast
-from data_cleaning_sets import measure_names, descriptors, fractions, gram_conversions, fraction_conversions, accepted_units
+from data_cleaning_sets import measure_names, descriptors, fractions, gram_conversions, fraction_conversions, accepted_units, accepted_measures
 
 
 # Open JSON file & parse lines
@@ -109,6 +110,22 @@ def load_recipes():
                 for item in line['ingredients']:
                     item = re.sub(r" ?\([^)]+\)", "", item)
                     item = item.lower().split(" ")
+                    print item
+                    amt = [i for i in item if i.isnumeric()]
+
+                    if len(amt) > 0:
+                        amt = amt[0]
+                    else:
+                        amt = None
+
+                    print amt
+                    unit = [i for i in item if (i in accepted_measures)]
+
+                    if len(unit) > 0:
+                        unit = accepted_measures[unit[0]]
+                    else:
+                        unit = None
+
                     item = [i for i in item if ((i.isnumeric() is False) and (len(i) > 0) and (i not in measure_names and i not in descriptors and i not in fractions))]
                     item = " ".join(item).rstrip().encode('utf-8')
                     item = item.split(',')
@@ -120,8 +137,19 @@ def load_recipes():
             # INGREDIENTS QTY (uses cleaned ingredient names as keys; converts
             # amounts to grams for consistency)
                         if item not in ingredient_amounts:
-                            ingredient_amounts[item] = 1
-
+                            if amt is not None and len(amt) > 0:
+                                if unit is not None:
+                                    amt = amt[0]
+                                    if not amt.isdigit():
+                                        amt = numeric(amt)
+                                    ingredient_amounts[item] = float(amt) * gram_conversions[unit]
+                                else:
+                                    amt = amt[0]
+                                    if not amt.isdigit():
+                                        amt = numeric(amt)
+                                    ingredient_amounts[item] = amt
+                            else:
+                                ingredient_amounts[item] = None
 
 
             ########################################################################

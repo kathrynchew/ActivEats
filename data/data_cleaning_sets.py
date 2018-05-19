@@ -8,7 +8,7 @@ measure_names = set(["cup", "cups", "teaspoon", "teaspoons", "tsp",
                      "bag", "liter", "pieces", "bags", "slices", "cans",
                      "jar", "1/2cup", "cup/60ml", "box", "cans",
                      "cup/250ml", "piece", "g", "pkg", "pkg.", "piece",
-                     "liters"])
+                     "liters", "qt", "qt."])
 
 descriptors = set(["bulk", "store-bought", "finely", "diced", "chopped",
                    "coarse", "coarsely", "freshly", "sliced", "loose",
@@ -50,3 +50,27 @@ accepted_units = ['serving', 'servings', 'piece', 'pieces', 'cup', 'cups',
       'truffle', 'truffles', 'burger', 'burgers', 'hors',
       "d'oeuvres", 'pint', 'pints', 'cake', 'cakes', 'pie',
       'pies']
+
+accepted_measures = {"teaspoon": "teaspoon",
+                     "tsp": "teaspoon",
+                     "tsp.": "teaspoon",
+                     "teaspoons": "teaspoon",
+                     "tablespoon": "tablespoon",
+                     "tbsp": "tablespoon",
+                     "tbsp.": "tablespoon",
+                     "tablespoons": "tablespoon",
+                     "cup": "cup",
+                     "cups": "cup",
+                     "ounce": "ounce",
+                     "ounces": "ounce",
+                     "oz": "ounce",
+                     "oz.": "ounce",
+                     "quart": "quart",
+                     "quarts": "quart",
+                     "qt": "quart",
+                     "qt.": "quart",
+                     "pound": "pound",
+                     "pounds": "pound",
+                     "lb": "pound",
+                     "lb.": "pound"
+                     }
