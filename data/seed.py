@@ -110,6 +110,7 @@ def load_recipes():
 
                 for item in line['ingredients']:
                     item = re.sub(r" ?\([^)]+\)", "", item)
+                    item = re.sub(r"\b-\b", " ", item)
                     item = item.lower().split(" ")
                     amt = [i for i in item if i.isnumeric() or i in fraction_conversions]
 

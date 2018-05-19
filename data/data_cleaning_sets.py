@@ -19,7 +19,8 @@ descriptors = set(["bulk", "store-bought", "finely", "diced", "chopped",
                    "drops", "drop", "small", "of", "plus", "to", "few",
                    "bulk", "pure", "good", "quality", "thinly", "thickly",
                    "one", "name", "taste", "recipe", "gently", "storebought",
-                   "strong", "little", "if", "desired", "cut", "into"])
+                   "strong", "little", "if", "desired", "cut", "into", "store",
+                   "bought"])
 
 fractions = set(["1/2", " 1/2", "1/4", "1/3", "3/4", "2/3", "1/8", "7/8", "1-",
                  "1/2-", "1/4-", "1/2-inch", "1/4-inch", "8-ounce",
