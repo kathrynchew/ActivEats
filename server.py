@@ -1,8 +1,9 @@
 """ Recipes """
 
-from flask import Flask
+from jinja2 import StrictUndefined
+from flask import Flask, render_template, redirect, request, flash, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
-from model import connect_to_db, db, SampleFNRecipe
+from model import connect_to_db, db, Recipe, Ingredient, RecipeIngredient, Category, RecipeCategory, Difficulty, RecipeDifficulty, User, UserPreference, Collection
 import pdb
 
 app = Flask(__name__)
@@ -12,6 +13,13 @@ app.secret_key = "ITS_A_SECRET"
 ################################################################################
 # ROUTES GO HERE
 
+@app.route('/')
+def display_dietary_preferences():
+    """ Home page """
+    recipe = db.session.query(Category.category_name).filter_by(is_preference=True).all()
+
+    return render_template("home.html",
+                           recipe=recipe)
 
 
 ################################################################################
