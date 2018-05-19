@@ -1,7 +1,7 @@
 """ Utility file to clean & seed recipe database from scraped data """
 
 from sqlalchemy import func
-from model import SampleFNRecipe, Ingredient, RecipeIngredient, Category, RecipeCategory, Difficulty, RecipeDifficulty, connect_to_db, db
+from model import Recipe, Ingredient, RecipeIngredient, Category, RecipeCategory, Difficulty, RecipeDifficulty, connect_to_db, db
 from server import app
 import json
 import re
@@ -19,13 +19,13 @@ with open("recipe_files/all_recipes_jsontest.json") as file:
 ################################# LOAD RECIPES #################################
 ################################################################################
 def load_recipes():
-    """ Load recipes into FOOD_NETWORK_INSPECT table """
+    """ Load recipes into RECIPES table """
 
-    print "Adding SampleFNRecipe"
+    print "Adding Recipes"
 
     # Delete all rows in table, so sample table can be created repeatedly with
     # new data and no duplicates
-    # SampleFNRecipe.query.delete()
+    # Recipe.query.delete()
 
     urls_plus_ingredients = {}
     qty_data = set()
@@ -104,16 +104,15 @@ def load_recipes():
             # INGREDIENTS NAMES (cleaned of measures, numeric amounts, commentary)
             urls_plus_ingredients[url] = set()
             ingredient_amounts = {}
+            ingredient_units = {}
 
             if len(line['ingredients']) > 0:
 
                 for item in line['ingredients']:
                     item = re.sub(r" ?\([^)]+\)", "", item)
                     item = item.lower().split(" ")
-                    print item
                     amt = [i for i in item if i.isnumeric() or i in fraction_conversions]
 
-                    print amt
                     if len(amt) > 0:
                         if amt[0] in fraction_conversions:
                             amt = [fraction_conversions[amt[0]]]
@@ -125,7 +124,6 @@ def load_recipes():
                     else:
                         amt = None
 
-                    print amt
                     unit = [i for i in item if (i in accepted_measures)]
 
                     if len(unit) > 0:
@@ -142,14 +140,14 @@ def load_recipes():
                         urls_plus_ingredients[url].add(item)
 
             # INGREDIENTS QTY (uses cleaned ingredient names as keys; converts
-            # amounts to grams for consistency)
+            # amounts to grams for consistency; also tracks corresponding units)
                         if item not in ingredient_amounts:
                             if amt is not None and len(amt) > 0:
                                 if unit is not None:
                                     amt = amt[0]
                                     if type(amt) != float and not amt.isdigit():
                                         amt = numeric(amt)
-                                    ingredient_amounts[item] = float(amt) * gram_conversions[unit]
+                                    ingredient_amounts[item] = round((float(amt) * gram_conversions[unit]), 2)
                                 else:
                                     amt = amt[0]
                                     if type(amt) != float and not amt.isdigit():
@@ -157,6 +155,11 @@ def load_recipes():
                                     ingredient_amounts[item] = amt
                             else:
                                 ingredient_amounts[item] = None
+
+                        # Add ingredient units to ingredient_units dictionary
+                        if item not in ingredient_units:
+                            if unit is not None:
+                                ingredient_units[item] = unit
 
 
             ########################################################################
@@ -256,22 +259,23 @@ def load_recipes():
             # CREATE OBJECT: Declare object, declare all column values, add object
             # to database, rise & repeat.
 
-            recipe = SampleFNRecipe(recipe_name=recipe_name,
-                                    recipe_author=recipe_author,
-                                    servings_num=servings_num,
-                                    servings_unit=servings_unit,
-                                    text_servings=text_servings,
-                                    special_equipment=special_equipment,
-                                    text_ingredients=text_ingredients,
-                                    ingredient_amounts=ingredient_amounts,
-                                    preparation=preparation,
-                                    total_time=total_time,
-                                    prep_time=prep_time,
-                                    cook_time=cook_time,
-                                    active_time=active_time,
-                                    inactive_time=inactive_time,
-                                    photo_url=photo_url,
-                                    recipe_url=url)
+            recipe = Recipe(recipe_name=recipe_name,
+                            recipe_author=recipe_author,
+                            servings_num=servings_num,
+                            servings_unit=servings_unit,
+                            text_servings=text_servings,
+                            special_equipment=special_equipment,
+                            text_ingredients=text_ingredients,
+                            ingredient_amounts=ingredient_amounts,
+                            ingredient_units=ingredient_units,
+                            preparation=preparation,
+                            total_time=total_time,
+                            prep_time=prep_time,
+                            cook_time=cook_time,
+                            active_time=active_time,
+                            inactive_time=inactive_time,
+                            photo_url=photo_url,
+                            recipe_url=url)
 
             db.session.add(recipe)
 
@@ -363,7 +367,7 @@ def load_difficulty(difficulty_types):
 ############################# ASSOCIATION TABLES ###############################
 ################################################################################
 
-# Query all recipe_id entries from FOOD_NETWORK_INSPECT table for reference in
+# Query all recipe_id entries from RECIPES table for reference in
 # constructing all association tables
 
 # Build association tables
@@ -374,7 +378,7 @@ def load_recipe_ingredients(urls_plus_ingredients):
 
     # RecipeIngredient.query.delete()
 
-    all_recipe_ids = db.session.query(SampleFNRecipe.recipe_id, SampleFNRecipe.recipe_url).all()
+    all_recipe_ids = db.session.query(Recipe.recipe_id, Recipe.recipe_url).all()
 
     for pair in all_recipe_ids:
         recipe_url = pair[1]
@@ -398,7 +402,7 @@ def load_recipe_categories(urls_plus_categories):
 
     # RecipeCategory.query.delete()
 
-    all_recipe_ids = db.session.query(SampleFNRecipe.recipe_id, SampleFNRecipe.recipe_url).all()
+    all_recipe_ids = db.session.query(Recipe.recipe_id, Recipe.recipe_url).all()
 
     for pair in all_recipe_ids:
         recipe_url = pair[1]
@@ -422,7 +426,7 @@ def load_recipe_difficulty(urls_plus_difficulty):
 
     # RecipeDifficulty.query.delete()
 
-    all_recipe_ids = db.session.query(SampleFNRecipe.recipe_id, SampleFNRecipe.recipe_url).order_by(SampleFNRecipe.recipe_id).all()
+    all_recipe_ids = db.session.query(Recipe.recipe_id, Recipe.recipe_url).order_by(Recipe.recipe_id).all()
 
     for pair in all_recipe_ids:
         recipe_url = pair[1]
@@ -446,7 +450,7 @@ def load_recipe_difficulty(urls_plus_difficulty):
 #     """Set value for the next recipe_id after seeding database"""
 
 #     # Get the Max user_id in the database
-#     result = db.session.query(func.max(SampleFNRecipe.recipe_id)).one()
+#     result = db.session.query(func.max(Recipe.recipe_id)).one()
 #     max_id = int(result[0])
 
 #     # Set the value for the next user_id to be max_id + 1

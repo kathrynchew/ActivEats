@@ -14,26 +14,25 @@ db = SQLAlchemy()
 ################################################################################
 # RECIPE TABLE
 
-class SampleFNRecipe(db.Model):
+class Recipe(db.Model):
     """ Table for inspecting data directly scraped from Food Network database.
 
     This data is meant to be for sampling, cleaning & informing data modeling;
     it will not be used in the final product. """
 
-    __tablename__ = "food_network_inspect"
+    __tablename__ = "recipes"
 
     recipe_id = db.Column(db.Integer, autoincrement=True, primary_key=True,
                           nullable=False)
     recipe_name = db.Column(db.Text, nullable=False)
     recipe_author = db.Column(db.Text, nullable=True)
-    # category_tags = db.Column(db.ARRAY(db.Text), nullable=False)
-    # difficulty = db.Column(db.Text, nullable=True)
     servings_num = db.Column(db.Integer, nullable=True)
     servings_unit = db.Column(db.Text, nullable=True)
     text_servings = db.Column(db.Text, nullable=True)
     special_equipment = db.Column(db.Text, nullable=True)
     text_ingredients = db.Column(db.ARRAY(db.Text), nullable=False)
     ingredient_amounts = db.Column(db.JSON, nullable=True)
+    ingredient_units = db.Column(db.JSON, nullable=True)
     preparation = db.Column(db.Text, nullable=False)
     total_time = db.Column(db.Interval, nullable=True)
     prep_time = db.Column(db.Interval, nullable=True)
@@ -57,7 +56,7 @@ class Ingredient(db.Model):
     amounts, with spaces left for nutrient information.
 
     Has foreign key relationship with a ingredient_amounts middle table (connects
-    to food_network_inspect table"""
+    to recipes table"""
 
     __tablename__ = "ingredient_attributes"
 
@@ -120,20 +119,20 @@ class Difficulty(db.Model):
 
 class RecipeIngredient(db.Model):
     """ Middle table connecting recipes with each ingredient they contain;
-    links FOOD_NETWORK_INSPECT table (Foreign Key: recipe_id) to
+    links recipes table (Foreign Key: recipe_id) to
     INGREDIENT_ATTRIBUTES table (Foreign Key: ingredient_id) """
 
     __tablename__ = "recipe_ingredients"
 
     rec_ing_id = db.Column(db.Integer, autoincrement=True, primary_key=True,
                            nullable=False)
-    recipe_id = db.Column(db.Integer, db.ForeignKey('food_network_inspect.recipe_id'), nullable=False)
+    recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.recipe_id'), nullable=False)
     # recipe_url = db.Column(db.Text, nullable=True)
     ingredient_id = db.Column(db.Integer, db.ForeignKey('ingredient_attributes.ingredient_id'), nullable=False)
     # ingredient_name = db.Column(db.Text, nullable=True)
 
-    food_network_inspect = db.relationship("SampleFNRecipe",
-                                           # primaryjoin="food_network_inspect.recipe_url==recipe_ingredients.recipe_url",
+    recipes = db.relationship("Recipe",
+                                           # primaryjoin="recipes.recipe_url==recipe_ingredients.recipe_url",
                                            backref=db.backref("recipe_ingredients",
                                                               order_by=recipe_id))
 
@@ -151,19 +150,19 @@ class RecipeIngredient(db.Model):
 
 class RecipeCategory(db.Model):
     """ Middle table connecting recipes with each category tag that describes
-    them; links FOOD_NETWORK_INSPECT table (Foreign Key: recipe_id) to
+    them; links recipes table (Foreign Key: recipe_id) to
     CATEGORY table (Foreign Key: category_id) """
 
     __tablename__ = "recipe_categories"
 
     rec_cat_id = db.Column(db.Integer, autoincrement=True, primary_key=True,
                            nullable=False)
-    recipe_id = db.Column(db.Integer, db.ForeignKey('food_network_inspect.recipe_id'),
+    recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.recipe_id'),
                           nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category_tags.category_id'),
                             nullable=False)
 
-    food_network_inspect = db.relationship("SampleFNRecipe",
+    recipes = db.relationship("Recipe",
                                            backref=db.backref("recipe_categories",
                                                               order_by=recipe_id))
 
@@ -180,18 +179,18 @@ class RecipeCategory(db.Model):
 
 class RecipeDifficulty(db.Model):
     """ Middle table connecting recipes with their respective difficulty level;
-    links FOOD_NETWORK_INSPECT table (Foreign Key: recipe_id) to DIFFICULTY
+    links recipes table (Foreign Key: recipe_id) to DIFFICULTY
     table (Foreign Key: difficulty_id) """
 
     __tablename__ = "recipe_difficulty"
 
     rec_dif_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    recipe_id = db.Column(db.Integer, db.ForeignKey('food_network_inspect.recipe_id'),
+    recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.recipe_id'),
                           nullable=False)
     difficulty_id = db.Column(db.Integer, db.ForeignKey('difficulty_level.difficulty_id'),
                               nullable=False)
 
-    food_network_inspect = db.relationship("SampleFNRecipe",
+    recipes = db.relationship("Recipe",
                                            backref=db.backref("recipe_difficulty",
                                                               order_by=recipe_id))
 

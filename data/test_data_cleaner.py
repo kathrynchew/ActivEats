@@ -1,5 +1,5 @@
 from sqlalchemy import func
-from model import SampleFNRecipe, connect_to_db, db
+from model import Recipe, connect_to_db, db
 from server import app
 import json
 import re

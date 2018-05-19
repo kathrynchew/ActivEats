@@ -1,3 +1,6 @@
+# MEASURE NAMES / DESCRIPTORS / FRACTIONS for cleaning ingredient names out of
+# strings
+
 measure_names = set(["cup", "cups", "teaspoon", "teaspoons", "tsp",
                      "tsp.", "tablespoon", "tablespoons", "tbsp",
                      "tbsp.", "ounce", "ounces", "oz", "oz.", "package",
@@ -26,6 +29,10 @@ fractions = set(["1/2", " 1/2", "1/4", "1/3", "3/4", "2/3", "1/8", "7/8", "1-",
                  "1/2-ounce", "1/o8-inch-think", "2-2", "4-ounces",
                  "2-1", "14-ounce", "1/4-ounce"])
 
+
+# GRAM CONVERSIONS / FRACTION CONVERSIONS for cleaning ingredient quantities
+# out of strings & converting them (where appropriate) to unified gram amounts
+
 gram_conversions = {"teaspoon": 4.2,
                     "tablespoon": 14.3,
                     "cup": 340,
@@ -44,13 +51,19 @@ fraction_conversions = {"1/2": 0.5,
                         u'1\xbd': 1.5
                         }
 
+
+# ACCEPTED UNITS: Units of measure for serving sizes/quantities
+
 accepted_units = ['serving', 'servings', 'piece', 'pieces', 'cup', 'cups',
-      'dozen', 'square', 'squares', 'quart', 'quarts', 'portion',
-      'portions', 'pizza', 'pizzas', 'sandwich', 'sandwiches',
-      'cookie', 'cookies', 'pancake', 'panakes', 'bun', 'buns',
-      'truffle', 'truffles', 'burger', 'burgers', 'hors',
-      "d'oeuvres", 'pint', 'pints', 'cake', 'cakes', 'pie',
-      'pies']
+                  'dozen', 'square', 'squares', 'quart', 'quarts', 'portion',
+                  'portions', 'pizza', 'pizzas', 'sandwich', 'sandwiches',
+                  'cookie', 'cookies', 'pancake', 'panakes', 'bun', 'buns',
+                  'truffle', 'truffles', 'burger', 'burgers', 'hors',
+                  "d'oeuvres", 'pint', 'pints', 'cake', 'cakes', 'pie',
+                  'pies']
+
+
+# ACCEPTED MEASURES: Units of measure for ingredients
 
 accepted_measures = {"teaspoon": "teaspoon",
                      "tsp": "teaspoon",
@@ -73,5 +86,5 @@ accepted_measures = {"teaspoon": "teaspoon",
                      "pound": "pound",
                      "pounds": "pound",
                      "lb": "pound",
-                     "lb.": "pound"
+                     "lb.": "pound",
                      }
