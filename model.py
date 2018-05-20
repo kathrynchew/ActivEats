@@ -145,7 +145,7 @@ class RecipeIngredient(db.Model):
     def __repr__(self):
         """ Representative model for recipe-ingredient relationships """
 
-        return "<Recipe_id: {}, Ingredient_id:{}>".format(self.recipe_id,
+        return "<RecipeIngredient recipe_id: {}, ingredient_id:{}>".format(self.recipe_id,
                                                           self.ingredient_id)
 
 
@@ -164,8 +164,8 @@ class RecipeCategory(db.Model):
                             nullable=False)
 
     recipes = db.relationship("Recipe",
-                                           backref=db.backref("recipe_categories",
-                                                              order_by=recipe_id))
+                              backref=db.backref("recipe_categories",
+                                                 order_by=recipe_id))
 
     category_tags = db.relationship("Category",
                                     backref=db.backref("recipe_categories",
@@ -174,7 +174,7 @@ class RecipeCategory(db.Model):
     def __repr__(self):
         """ Representative model for recipe-category relationships """
 
-        return "Recipe_id: {}, Category_id:{}>".format(self.recipe_id,
+        return "<RecipeCategory recipe_id: {}, category_id:{}>".format(self.recipe_id,
                                                        self.category_id)
 
 
@@ -202,7 +202,7 @@ class RecipeDifficulty(db.Model):
     def __repr__(self):
         """ Representative model for recipe-difficulty relationships """
 
-        return "<Recipe_id: {}, Difficulty_id: {}>".format(self.recipe_id,
+        return "<RecipeDifficulty recipe_id: {}, difficulty_id: {}>".format(self.recipe_id,
                                                            self.difficulty_id)
 
 ################################################################################
@@ -231,7 +231,7 @@ class User(db.Model):
     def __repr__(self):
         """ Representative model for user objects """
 
-        return "<User id: {}, Username: {}>".format(self.user_id,
+        return "<User user_id: {}, username: {}>".format(self.user_id,
                                                     self.username)
 
 class UserPreference(db.Model):
@@ -258,7 +258,7 @@ class UserPreference(db.Model):
     def __repr__(self):
         """ Representative model for user/dietary preference associations """
 
-        return "<Preference id: {}, User id: {}>".format(self.user_pref_id,
+        return "<UserPreference user_pref_id: {}, user_id: {}>".format(self.user_pref_id,
                                                          self.user_id)
 
 
@@ -291,10 +291,10 @@ class Collection(db.Model):
         """ Representative model for recipe objects in user collections of
         recipes """
 
-        return "<Id: {} -- set #{}, day #{}: {}>".format(self.user_col_id,
-                                                         self.set_number,
-                                                         self.set_day,
-                                                         self.meal_type)
+        return "<Collection user_col_id: {} -- set #{}, day #{}: {}>".format(self.user_col_id,
+                                                                             self.set_number,
+                                                                             self.set_day,
+                                                                             self.meal_type)
 
 
 

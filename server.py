@@ -17,7 +17,15 @@ app.secret_key = "ITS_A_SECRET"
 @app.route('/')
 def display_dietary_preferences():
     """ Home page """
-    recipe = db.session.query(Category.category_name).filter_by(is_preference=True).all()
+    # recipe = db.session.query(Category.category_name).filter_by(is_preference=True).all()
+    recipe = Category.query.filter_by(is_preference=True).all()
+
+    for item in recipe:
+        # print item.recipe_categories
+        for cat in item.recipe_categories:
+            # print cat.recipes
+            for obj in cat.recipes:
+                print obj.recipe_name
 
     return render_template("home.html",
                            recipe=recipe)
@@ -28,6 +36,8 @@ def display_recipe_formatting():
     recipe_id = random.randint(1, 990)
 
     recipe_text = Recipe.query.filter_by(recipe_id=recipe_id).first()
+
+    print recipe_text.recipe_categories
 
     return render_template("display_recipe.html",
                            recipe_text=recipe_text)

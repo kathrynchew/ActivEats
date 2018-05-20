@@ -32,6 +32,10 @@ by {{ recipe_text.recipe_author }}
 &nbsp;&nbsp;|&nbsp;&nbsp;<b>Inactive Time:</b> {{ recipe_text.inactive_time }}
 {% endif %}
 <hr>
+<br>{% for item in recipe_text.recipe_categories %}
+{{ item.category_tags.category_name }},&nbsp;
+{% endfor %}
+<hr>
 <h4>Ingredients</h4>
 <ul>
     {% for item in recipe_text.text_ingredients %}

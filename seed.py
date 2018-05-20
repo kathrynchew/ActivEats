@@ -258,7 +258,7 @@ def load_recipes():
 
             ########################################################################
             # PHOTO URL: Check if photo URL exists or has default "N/A" value
-            # assigned from scrapy. If N/A, rebinds variable to python/jinja 
+            # assigned from scrapy. If N/A, rebinds variable to python/jinja
             # parsable "None"
 
             photo_url = line['photo_url']
