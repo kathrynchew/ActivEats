@@ -33,7 +33,7 @@ class Recipe(db.Model):
     text_ingredients = db.Column(db.ARRAY(db.Text), nullable=False)
     ingredient_amounts = db.Column(db.JSON, nullable=True)
     ingredient_units = db.Column(db.JSON, nullable=True)
-    preparation = db.Column(db.ARRAY(db.Text), nullable=False)
+    preparation = db.Column(db.Text, nullable=False)
     total_time = db.Column(db.Interval, nullable=True)
     prep_time = db.Column(db.Interval, nullable=True)
     cook_time = db.Column(db.Interval, nullable=True)

@@ -12,7 +12,7 @@ from data_cleaning_sets import measure_names, descriptors, fractions, gram_conve
 
 
 # Open JSON file & parse lines
-with open("recipe_files/all_recipes_jsontest.json") as file:
+with open("data/recipe_files/all_recipes_jsontest.json") as file:
     recipe_lines = json.load(file)
 
 ################################################################################
@@ -182,7 +182,9 @@ def load_recipes():
 
             stripped_prep = []
             for p in line['preparation']:
-                stripped_prep.append(p.lstrip().rstrip())
+                if len(p.lstrip().rstrip()) > 0:
+                    stripped_prep.append(p.lstrip().rstrip())
+
             preparation = stripped_prep
 
 
