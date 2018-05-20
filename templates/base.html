@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>{% block title %} put your title here {% endblock %}</title>
+    <title>ActivEats: {% block title %} put your title here {% endblock %}</title>
     <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 </head>
@@ -21,11 +21,11 @@
               <a class="nav-link" href="/recipes">All Recipes</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="my_week">Meal Plan</a>
+              <a class="nav-link" href="/my_week">Meal Plan</a>
             </li>
           </ul>
-          <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+          <form class="form-inline my-2 my-lg-0" action="/search">
+            <input name="search_term" class="form-control mr-sm-2" type="search" placeholder="Find a Recipe" aria-label="Search">
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
           </form>
         </div>

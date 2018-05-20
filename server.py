@@ -100,6 +100,23 @@ def display_current_meal_plan():
                            dinners=weekly_dinners)
 
 
+@app.route('/search')
+def display_search_results():
+    """ Displays any results from a recipe search """
+
+    search_term = request.args.get('search_term')
+    print search_term
+
+    search_results_names = Recipe.query.filter(Recipe.recipe_name.like("%{}%".format(search_term.title()))).all()
+    search_results_categories = Category.query.filter(Category.category_name.like("%{}%".format(search_term.title()))).all()
+
+    print search_results_names
+    print search_results_categories
+    print "yo bro"
+
+    return redirect("/")
+
+
 
 ################################################################################
 if __name__ == "__main__":
@@ -113,5 +130,6 @@ if __name__ == "__main__":
 
     # Use the DebugToolbar
     DebugToolbarExtension(app)
+    DEBUG_TB_INTERCEPT_REDIRECTS = False
 
     app.run(port=5000, host='0.0.0.0')
