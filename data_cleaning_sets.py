@@ -99,3 +99,14 @@ category_preferences = ["Low Calorie", "Gluten Free", "Vegetarian", "Low-Carb",
 # category_preferences = ["Low Calorie", "Heart-Healthy", "Gluten Free",
 #                         "Vegetarian", "Low-Cholesterol", "Low-Carb", "Low-Fat",
 #                         "Vegan"]
+
+# BREAKFAST / LUNCH / DINNER LISTS: Lists of category tag names used for filtering
+# recipes to populate weekly meal plans
+
+breakfast_list = ['Easy Breakfast Recipes', 'Healthy Breakfast', 'Breakfast Casserole']
+
+lunch_list = ['Lunch', 'Easy Lunch Recipes', 'Healthy Lunch', 'Main Dish',
+              'Easy Main Dish']
+
+dinner_list = ['Healthy Dinner', 'Easy Dinner Recipes', 'Main Dish',
+               'Easy Main Dish']

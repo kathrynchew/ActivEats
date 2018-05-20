@@ -4,7 +4,9 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, redirect, request, flash, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db, Recipe, Ingredient, RecipeIngredient, Category, RecipeCategory, Difficulty, RecipeDifficulty, User, UserPreference, Collection
+from data_cleaning_sets import breakfast_list, lunch_list, dinner_list
 import random
+from datetime import datetime
 import pdb
 
 app = Flask(__name__)
@@ -60,6 +62,46 @@ def recipe_page(recipe_id):
 
     return render_template("display_recipe.html",
                            recipe_text=recipe_info)
+
+
+@app.route('/my_week')
+def display_current_meal_plan():
+    """ If no meal plan currently exists, creates one. If meal plan already
+    exits, displays the current week's meal plan """
+
+    breakfast_recipes = []
+    lunch_recipes = []
+    dinner_recipes = []
+
+    breakfast = Category.query.filter(Category.category_name.in_(breakfast_list)).all()
+    lunch = Category.query.filter(Category.category_name.in_(lunch_list)).all()
+    dinner = Category.query.filter(Category.category_name.in_(dinner_list)).all()
+
+    for category in breakfast:
+        for recipe in category.recipe_categories:
+            breakfast_recipes.append(recipe.recipes)
+
+    for category in lunch:
+        for recipe in category.recipe_categories:
+            lunch_recipes.append(recipe.recipes)
+
+    for category in dinner:
+        for recipe in category.recipe_categories:
+            dinner_recipes.append(recipe.recipes)
+
+    weekly_breakfasts = random.sample(breakfast_recipes, 5)
+    weekly_lunches = random.sample(lunch_recipes, 5)
+    weekly_dinners = random.sample(dinner_recipes, 5)
+
+    print "Breakfast: "
+    print weekly_breakfasts
+    print "Lunch: "
+    print weekly_lunches
+    print "Dinner: "
+    print weekly_dinners
+
+    return render_template("meal_plan.html",
+                           now=datetime.utcnow())
 
 
 
