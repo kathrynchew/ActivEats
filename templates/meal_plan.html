@@ -13,27 +13,21 @@
     </tr>
     <tr>
         <td>Breakfast</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        {% for recipe in breakfasts %}
+        <td><a href='/recipes/{{ recipe.recipe_id }}'>{{ recipe.recipe_name }}</a></td>
+        {% endfor %}
     </tr>
         <tr>
         <td>Lunch</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        {% for recipe in lunches %}
+        <td><a href='/recipes/{{ recipe.recipe_id }}'>{{ recipe.recipe_name }}</a></td>
+        {% endfor %}
     </tr>
         <tr>
         <td>Dinner</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        {% for recipe in dinners %}
+        <td><a href='/recipes/{{ recipe.recipe_id }}'>{{ recipe.recipe_name }}</a></td>
+        {% endfor %}
     </tr>
 </table>
 {% endblock %}

@@ -101,7 +101,10 @@ def display_current_meal_plan():
     print weekly_dinners
 
     return render_template("meal_plan.html",
-                           now=datetime.utcnow())
+                           now=datetime.utcnow(),
+                           breakfasts=weekly_breakfasts,
+                           lunches=weekly_lunches,
+                           dinners=weekly_dinners)
 
 
 
