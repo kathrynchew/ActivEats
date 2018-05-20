@@ -30,6 +30,7 @@ def display_dietary_preferences():
     return render_template("home.html",
                            recipe=recipe)
 
+
 @app.route('/test')
 def display_recipe_formatting():
     """ Figure out how to display a recipe """
@@ -41,6 +42,24 @@ def display_recipe_formatting():
 
     return render_template("display_recipe.html",
                            recipe_text=recipe_text)
+
+
+@app.route('/recipes')
+def display_recipe_list():
+    """ Generate & display a complete list of recipe objects """
+    all_recipes = Recipe.query.order_by('recipe_id').all()
+
+    return render_template("recipes.html",
+                           all_recipes=all_recipes)
+
+
+@app.route('/recipes/<recipe_id>')
+def recipe_page(recipe_id):
+    """ Display the contents of a specific recipe """
+    recipe_info = Recipe.query.filter_by(recipe_id=recipe_id).first()
+
+    return render_template("display_recipe.html",
+                           recipe_text=recipe_info)
 
 
 
