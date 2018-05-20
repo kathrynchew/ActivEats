@@ -114,7 +114,10 @@ def display_search_results():
     print search_results_categories
     print "yo bro"
 
-    return redirect("/")
+    return render_template("search_results.html",
+                           recipes=search_results_names,
+                           categories=search_results_categories,
+                           search_term=search_term)
 
 
 

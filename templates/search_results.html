@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Search Results{% endblock %}
+{% block content %}
+<h1>Search Results</h1>
+You searched for: {{ search_term }}
+<hr>
+<h3>Recipes:</h3>
+<ul>
+{% if recipes|length > 0 %}
+    {% for recipe in recipes %}
+        <li><a href='/recipes/{{ recipe.recipe_id }}'>{{ recipe.recipe_name }}</a></li>
+    {% endfor %}
+{% else %}
+    <li>No recipes were found</li>
+{% endif %}
+</ul>
+<hr>
+<h3>Related Categories:</h3>
+{% if categories|length > 0 %}
+    {% for category in categories %}
+    <a href='#'>{{ category.category_name }}</a>&nbsp;
+    {% endfor %}
+{% else %}
+    No related categories were found
+{% endif %}
+{% endblock %}
