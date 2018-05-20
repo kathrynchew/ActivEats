@@ -41,8 +41,6 @@ def load_recipes():
             url = line['url']
             difficulty = "".join(line['difficulty'])
             recipe_name = line['recipe_name']
-            recipe_author = line['recipe_author']
-            photo_url = line['photo_url']
 
 
             ########################################################################
@@ -70,10 +68,12 @@ def load_recipes():
             # and servings_unit (text of serving unit/quantity)
 
             servings = line['servings']
+            text_servings = line['servings']
 
             if servings == 'N/A':
                 servings_unit = None
                 servings_num = None
+                text_servings = None
 
             else:
                 servings = re.sub(r" ?\([^)]+\)", "", servings)
@@ -89,8 +89,6 @@ def load_recipes():
                     servings_unit = None
                 else:
                     servings_unit = " ".join(unit)
-
-            text_servings = line['servings']
 
 
             ########################################################################
@@ -256,6 +254,28 @@ def load_recipes():
                         inactive_time = inactive_time + t
                     else:
                         inactive_time = inactive_time + " {} ".format(times[t])
+
+
+            ########################################################################
+            # PHOTO URL: Check if photo URL exists or has default "N/A" value
+            # assigned from scrapy. If N/A, rebinds variable to python/jinja 
+            # parsable "None"
+
+            photo_url = line['photo_url']
+
+            if photo_url == 'http:N/A':
+                photo_url = None
+
+
+            ########################################################################
+            # RECIPE AUTHOR: Check if Recipe Author exists or has default "N/A"
+            # value assigned from scrapy. If N/A, rebinds variable to
+            # python/jinja parsable "None"
+
+            recipe_author = line['recipe_author']
+
+            if recipe_author == 'N/A':
+                recipe_author = None
 
 
             ########################################################################

@@ -2,13 +2,47 @@
 {% block title %}Sample Recipe{% endblock %}
 
 {% block content %}
-<h1>Here's a full(???) Recipe</h1>
-{{ recipe_text.recipe_name }}<br>
+<h1>Here's a Full Recipe</h1>
+<h3>{{ recipe_text.recipe_name }}</h3>
+{% if recipe_text.recipe_author is not none %}
 by {{ recipe_text.recipe_author }}
+{% endif %}
 <br><br>
+{% if recipe_text.photo_url is not none %}
+<img src="{{ recipe_text.photo_url }}" height=200px>
+{% endif %}
+<hr>
+{% if recipe_text.text_servings is not none %}
+{{ recipe_text.text_servings }}
+{% endif %}
+<br>
+{% if recipe_text.total_time is not none %}
+<b>Total Time:</b> {{ recipe_text.total_time }}
+{% endif %}
+{% if recipe_text.prep_time is not none %}
+&nbsp;&nbsp;|&nbsp;&nbsp;<b>Prep Time:</b> {{ recipe_text.prep_time }}
+{% endif %}
+{% if recipe_text.cook_time is not none %}
+&nbsp;&nbsp;|&nbsp;&nbsp;<b>Cook Time:</b> {{ recipe_text.cook_time }}
+{% endif %}
+{% if recipe_text.active_time is not none %}
+&nbsp;&nbsp;|&nbsp;&nbsp;<b>Active Time:</b> {{ recipe_text.active_time }}
+{% endif %}
+{% if recipe_text.inactive_time is not none %}
+&nbsp;&nbsp;|&nbsp;&nbsp;<b>Inactive Time:</b> {{ recipe_text.inactive_time }}
+{% endif %}
+<hr>
+<h4>Ingredients</h4>
 <ul>
-{% for item in recipe_text.preparation %}
-<li>{{ item }}</li>
-{% endfor %} 
+    {% for item in recipe_text.text_ingredients %}
+        <li>{{ item }}</li>
+    {% endfor %}
+</ul>
+<hr>
+<h4>Preparation Instructions</h4>
+<ul>
+    {% for item in recipe_text.preparation %}
+        <li>{{ item }}</li>
+    {% endfor %} 
 </ul>
 {% endblock %}

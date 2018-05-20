@@ -29,9 +29,6 @@ def display_recipe_formatting():
 
     recipe_text = Recipe.query.filter_by(recipe_id=recipe_id).first()
 
-    print type(recipe_text.preparation)
-    print recipe_text.preparation
-
     return render_template("display_recipe.html",
                            recipe_text=recipe_text)
 
