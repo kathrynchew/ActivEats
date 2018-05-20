@@ -105,10 +105,10 @@ def display_search_results():
     """ Displays any results from a recipe search """
 
     search_term = request.args.get('search_term')
-    print search_term
+    cleaned_term = search_term[:-2].title()
 
-    search_results_names = Recipe.query.filter(Recipe.recipe_name.like("%{}%".format(search_term.title()))).all()
-    search_results_categories = Category.query.filter(Category.category_name.like("%{}%".format(search_term.title()))).all()
+    search_results_names = Recipe.query.filter(Recipe.recipe_name.like("%{}%".format(cleaned_term))).all()
+    search_results_categories = Category.query.filter(Category.category_name.like("%{}%".format(cleaned_term))).all()
 
     print search_results_names
     print search_results_categories
