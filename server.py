@@ -22,12 +22,12 @@ def display_dietary_preferences():
     # recipe = db.session.query(Category.category_name).filter_by(is_preference=True).all()
     recipe = Category.query.filter_by(is_preference=True).all()
 
-    for item in recipe:
-        # print item.recipe_categories
-        for cat in item.recipe_categories:
-            # print cat.recipes
-            for obj in cat.recipes:
-                print obj.recipe_name
+    # for item in recipe:
+    #     # print item.recipe_categories
+    #     for cat in item.recipe_categories:
+    #         # print cat.recipes
+    #         for obj in cat.recipes:
+    #             print obj.recipe_name
 
     return render_template("home.html",
                            recipe=recipe)
@@ -92,13 +92,6 @@ def display_current_meal_plan():
     weekly_breakfasts = random.sample(breakfast_recipes, 5)
     weekly_lunches = random.sample(lunch_recipes, 5)
     weekly_dinners = random.sample(dinner_recipes, 5)
-
-    print "Breakfast: "
-    print weekly_breakfasts
-    print "Lunch: "
-    print weekly_lunches
-    print "Dinner: "
-    print weekly_dinners
 
     return render_template("meal_plan.html",
                            now=datetime.utcnow(),
