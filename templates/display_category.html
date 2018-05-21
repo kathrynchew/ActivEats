@@ -5,9 +5,20 @@
 <h3>Selected Category: {{ category_info.category_name }}</h3>
 <hr>
 <h4>Recipes:</h4>
-<ul>
+<div class="card-columns">
 {% for item in category_info.recipe_categories %}
-<li><a href='/recipes/{{ item.recipes.recipe_id }}'>{{ item.recipes.recipe_name }}</a></li>
+    <div class="card" style="width: 18rem;">
+      {% if item.recipes.photo_url is not none %}
+      <img class="card-img-top" src="{{ item.recipes.photo_url }}" alt="Card image cap">
+      {% else %}
+      <img class="card-img-top" src="/static/img/image_placeholder.png" alt="Card image cap">
+      {% endif %}
+      <div class="card-body">
+        <h5 class="card-title">{{ item.recipes.recipe_name }}</h5>
+        <a href="/recipes/{{ item.recipes.recipe_id }}" class="btn btn-primary">View Recipe</a>
+      </div>
+    </div>
 {% endfor %}
-</ul>
+</div>
+
 {% endblock %}

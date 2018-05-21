@@ -4,17 +4,6 @@
 <h1>Search Results</h1>
 You searched for: <span style='color:red'>{{ search_term }}</span>
 <hr>
-<h3>Recipes:</h3>
-<ul>
-{% if recipes|length > 0 %}
-    {% for recipe in recipes %}
-        <li><a href='/recipes/{{ recipe.recipe_id }}'>{{ recipe.recipe_name }}</a></li>
-    {% endfor %}
-{% else %}
-    <li>No recipes were found</li>
-{% endif %}
-</ul>
-<hr>
 <h3>Related Categories:</h3>
 {% if categories|length > 0 %}
     {% for category in categories %}
@@ -24,4 +13,28 @@ You searched for: <span style='color:red'>{{ search_term }}</span>
 {% else %}
     No related categories were found
 {% endif %}
+<hr>
+<h3>Recipes:</h3>
+{% if recipes|length > 0 %}
+    <div class="card-columns">
+        {% for recipe in recipes %}
+            <div class="card" style="width: 18rem;">
+              {% if recipe.photo_url is not none %}
+              <img class="card-img-top" src="{{ recipe.photo_url }}" alt="Card image cap">
+              {% else %}
+              <img class="card-img-top" src="/static/img/image_placeholder.png" alt="Card image cap">
+              {% endif %}
+              <div class="card-body">
+                <h5 class="card-title">{{ recipe.recipe_name }}</h5>
+                <a href="/recipes/{{ recipe.recipe_id }}" class="btn btn-primary">View Recipe</a>
+              </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <li>No recipes were found</li>
+{% endif %}
+
+
+
 {% endblock %}

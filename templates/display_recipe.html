@@ -3,6 +3,8 @@
 
 {% block content %}
 <h1>Here's a Full Recipe</h1>
+<div class="row">
+  <div class="col-sm-6">
 <h3>{{ recipe_text.recipe_name }}</h3>
 {% if recipe_text.recipe_author is not none %}
 by {{ recipe_text.recipe_author }}
@@ -36,6 +38,17 @@ by {{ recipe_text.recipe_author }}
 {% for item in recipe_text.recipe_categories %}
 <a href='/categories/{{ item.category_tags.category_id }}'>{{ item.category_tags.category_name }}</a>{% if not loop.last %},&nbsp;{% endif %}
 {% endfor %}
+ </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Generate Shopping List</h5>
+        <p class="card-text shopping-list">Click the button to generate a shopping list</p>
+        <a href="#" class="btn btn-primary shopping_button">Generate</a>
+      </div>
+    </div>
+  </div>
+</div>
 <hr>
 <h4>Ingredients</h4>
 <ul>

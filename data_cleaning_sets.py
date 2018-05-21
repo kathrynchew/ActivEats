@@ -103,7 +103,8 @@ category_preferences = ["Low Calorie", "Gluten Free", "Vegetarian", "Low-Carb",
 # BREAKFAST / LUNCH / DINNER LISTS: Lists of category tag names used for filtering
 # recipes to populate weekly meal plans
 
-breakfast_list = ['Easy Breakfast Recipes', 'Healthy Breakfast', 'Breakfast Casserole']
+breakfast_list = ['Easy Breakfast Recipes', 'Healthy Breakfast', 'Brunch',
+                  'Breakfast Casserole']
 
 lunch_list = ['Lunch', 'Easy Lunch Recipes', 'Healthy Lunch', 'Main Dish',
               'Easy Main Dish']
