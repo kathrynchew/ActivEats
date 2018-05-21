@@ -40,11 +40,11 @@ by {{ recipe_text.recipe_author }}
 {% endfor %}
  </div>
   <div class="col-sm-6">
-    <div class="card">
+    <div class="card bg-light mb-3">
       <div class="card-body">
-        <h5 class="card-title">Generate Shopping List</h5>
+        <h5 class="card-title shopping-title">Generate Shopping List</h5>
         <p class="card-text shopping-list">Click the button to generate a shopping list</p>
-        <a href="#" class="btn btn-primary shopping_button">Generate</a>
+        <a href="#" class="btn btn-primary shopping-button">Generate</a>
       </div>
     </div>
   </div>
@@ -65,4 +65,16 @@ by {{ recipe_text.recipe_author }}
 </ul>
 <br>
 <a href="{{ recipe_text.recipe_url }}">Click</a> to view original.
+
+<script type="text/javascript">
+function generateShoppingList(evt) {
+    // let ingredients = "{{ recipe_text.recipe_ingredients }}";
+    // console.log(ingredients);
+    document.querySelector('.shopping-title').innerText = "Shopping List"
+    document.querySelector('.shopping-list').innerHTML = "<ul>{% for item in recipe_text.recipe_ingredients %}<li>{{item.ingredient_attribute.ingredient_name }}</li>{% endfor %}</ul>"
+}
+
+document.querySelector('.shopping-button').addEventListener('click', generateShoppingList)
+
+</script>
 {% endblock %}
