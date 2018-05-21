@@ -2,7 +2,7 @@
 {% block title %}Search Results{% endblock %}
 {% block content %}
 <h1>Search Results</h1>
-You searched for: {{ search_term }}
+You searched for: <span style='color:red'>{{ search_term }}</span>
 <hr>
 <h3>Recipes:</h3>
 <ul>
@@ -18,7 +18,8 @@ You searched for: {{ search_term }}
 <h3>Related Categories:</h3>
 {% if categories|length > 0 %}
     {% for category in categories %}
-    <a href='#'>{{ category.category_name }}</a>&nbsp;
+    <a href='/categories/{{ category.category_id }}'>{{ category.category_name }}</a>{% if not loop.last %},&nbsp;
+    {% endif %}
     {% endfor %}
 {% else %}
     No related categories were found

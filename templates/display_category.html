@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}{{ category_info.category_name }}{% endblock %}
+{% block content %}
+<h1>Category Info</h1>
+<h3>Selected Category: {{ category_info.category_name }}</h3>
+<hr>
+<h4>Recipes:</h4>
+<ul>
+{% for item in category_info.recipe_categories %}
+<li><a href='/recipes/{{ item.recipes.recipe_id }}'>{{ item.recipes.recipe_name }}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}

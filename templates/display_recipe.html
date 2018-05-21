@@ -32,8 +32,9 @@ by {{ recipe_text.recipe_author }}
 &nbsp;&nbsp;|&nbsp;&nbsp;<b>Inactive Time:</b> {{ recipe_text.inactive_time }}
 {% endif %}
 <hr>
-<br>{% for item in recipe_text.recipe_categories %}
-{{ item.category_tags.category_name }},&nbsp;
+<h5>Categories:</h5>
+{% for item in recipe_text.recipe_categories %}
+<a href='/categories/{{ item.category_tags.category_id }}'>{{ item.category_tags.category_name }}</a>{% if not loop.last %},&nbsp;{% endif %}
 {% endfor %}
 <hr>
 <h4>Ingredients</h4>

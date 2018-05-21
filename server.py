@@ -64,6 +64,15 @@ def recipe_page(recipe_id):
                            recipe_text=recipe_info)
 
 
+@app.route('/categories/<category_id>')
+def category_page(category_id):
+    """ Display all recipes in a specific category """
+    category_info = Category.query.filter_by(category_id=category_id).first()
+
+    return render_template("display_category.html",
+                           category_info=category_info)
+
+
 @app.route('/my_week')
 def display_current_meal_plan():
     """ If no meal plan currently exists, creates one. If meal plan already
@@ -105,7 +114,7 @@ def display_search_results():
     """ Displays any results from a recipe search """
 
     search_term = request.args.get('search_term')
-    cleaned_term = search_term[:-2].title()
+    cleaned_term = search_term[:-1].title()
 
     search_results_names = Recipe.query.filter(Recipe.recipe_name.like("%{}%".format(cleaned_term))).all()
     search_results_categories = Category.query.filter(Category.category_name.like("%{}%".format(cleaned_term))).all()
