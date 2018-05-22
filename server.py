@@ -83,6 +83,27 @@ def welcome_login():
         return redirect("/login")
 
 
+@app.route('/welcome', methods=["POST"])
+def welcome_register():
+    """ If person attempts to create a new account, processes their data to create
+    account and log them in. Flashes message of success when complete """
+
+    username = request.form.get('username')
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    new_user = User(username=username,
+                    email=email,
+                    password=password)
+
+    db.session.add(new_user)
+
+    db.session.commit()
+
+    flash("You have successfully created an account!")
+    return redirect("/")
+
+
 @app.route('/recipes')
 def display_recipe_list():
     """ Generate & display a complete list of recipe objects """
