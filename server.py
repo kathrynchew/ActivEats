@@ -69,7 +69,12 @@ def welcome_login():
     email = request.args.get('email')
     password = request.args.get('password')
 
+    print email
+    print password
+
     query_email = User.query.filter_by(email=email).first()
+
+    print query_email
 
     if query_email:
         if query_email.password == password:
