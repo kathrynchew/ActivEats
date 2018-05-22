@@ -20,7 +20,14 @@ app.secret_key = "ITS_A_SECRET"
 def display_dietary_preferences():
     """ Home page """
     # recipe = db.session.query(Category.category_name).filter_by(is_preference=True).all()
-    recipe = Category.query.filter_by(is_preference=True).all()
+    # recipe = Category.query.filter_by(is_preference=True).all()
+    recipe_id = random.randint(1, 990)
+
+    featured_recipe = Recipe.query.filter_by(recipe_id=recipe_id).first()
+
+    while not featured_recipe.photo_url:
+        recipe_id = random.randint(1, 990)
+        featured_recipe = Recipe.query.filter_by(recipe_id=recipe_id).first()
 
     # for item in recipe:
     #     # print item.recipe_categories
@@ -30,7 +37,7 @@ def display_dietary_preferences():
     #             print obj.recipe_name
 
     return render_template("home.html",
-                           recipe=recipe)
+                           recipe=featured_recipe)
 
 
 @app.route('/test')
@@ -44,6 +51,36 @@ def display_recipe_formatting():
 
     return render_template("display_recipe.html",
                            recipe_text=recipe_text)
+
+
+@app.route('/login')
+def login_or_register():
+    """ Display form to allow users to login or register for an account """
+
+    return render_template("login_register.html")
+
+
+@app.route('/welcome', methods=["GET"])
+def welcome_login():
+    """ If person attempts to log in to an existing account, assesses if they
+    have an account. If so, logs them in. If not, flashes a message to alert
+    user to register or re-enter credentials correctly """
+
+    email = request.args.get('email')
+    password = request.args.get('password')
+
+    query_email = User.query.filter_by(email=email).first()
+
+    if query_email:
+        if query_email.password == password:
+            flash("You have successfully logged in!")
+            return redirect("/")
+        else:
+            flash("The password is incorrect. Please try again.")
+            return redirect("/login")
+    else:
+        flash("There is no account associated with that email. Please try again.")
+        return redirect("/login")
 
 
 @app.route('/recipes')

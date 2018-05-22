@@ -11,11 +11,11 @@ measure_names = set(["cup", "cups", "teaspoon", "teaspoons", "tsp",
                      "bag", "liter", "pieces", "bags", "slices", "cans",
                      "jar", "1/2cup", "cup/60ml", "box", "cans",
                      "cup/250ml", "piece", "g", "pkg", "pkg.", "piece",
-                     "liters", "qt", "qt."])
+                     "liters", "qt", "qt.", "inch", "hunk"])
 
 descriptors = set(["bulk", "store-bought", "finely", "diced", "chopped",
                    "coarse", "coarsely", "freshly", "sliced", "loose",
-                   "of", "minced", "fresh", "a", "store-bought", "brand",
+                   "of", "minced", "a", "store-bought", "brand",
                    "drops", "drop", "small", "of", "plus", "to", "few",
                    "bulk", "pure", "good", "quality", "thinly", "thickly",
                    "one", "name", "taste", "recipe", "gently", "storebought",
