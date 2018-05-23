@@ -21,4 +21,15 @@
 <h3>Login Information:</h3>
     <b>username:</b> {{ user_info.username }}<br>
     <b>email address:</b> {{ user_info.email }}
+
+<script type="text/javascript">
+function editPreferences(evt) {
+
+    document.querySelector("").innerHTML = '<form id="update_pref_form" action="/preferences/update" method="POST"><div class="form-group form-check" id="user-preferences" aria-describedby="preferenceHelp"><li class="list-group-item"><input type="checkbox" class="form-check-input" id="pref-vegetarian" name="prefs" value="Vegetarian"><label class="form-check-label" for="exampleCheck1">Vegetarian</label></li><li class="list-group-item"><input type="checkbox" class="form-check-input" id="pref-vegan" name="prefs" value="Vegan"><label class="form-check-label" for="exampleCheck1">Vegan</label></li><li class="list-group-item"><input type="checkbox" class="form-check-input" id="pref-glutenfree" name="prefs" value="Gluten Free"><label class="form-check-label" for="exampleCheck1">Gluten Free</label></li><li class="list-group-item"><input type="checkbox" class="form-check-input" id="pref-lowcarb" name="prefs" value="Low-Carb"><label class="form-check-label" for="exampleCheck1">Low-Carb</label></li><li class="list-group-item"><input type="checkbox" class="form-check-input" id="pref-lowcal" name="prefs" value="Low Calorie"><label class="form-check-label" for="exampleCheck1">Low Calorie</label></li></div><button type="submit" class="btn btn-primary">Submit</button></form>';
+
+
+}
+
+document.querySelector("#edit-prefs").addEventListener('click', editPreferences);
+</script>
 {% endblock %}
