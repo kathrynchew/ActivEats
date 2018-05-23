@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Preferences{% endblock %}
+{% block content %}
+<h1>{{ session['username'] }}'s Profile</h1>
+<hr>
+<h3>Dietary Preferences:</h3>
+<ul>
+{% if user_prefs|length > 0 %}
+    {% for pref in user_prefs %}
+    <li>{{ pref }}</li>
+    {% endfor %}
+{% else %}
+    <li>You have not specified any dietary preferences.</li>
+{% endif %}
+</ul>
+{% endblock %}

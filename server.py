@@ -56,6 +56,7 @@ def logout_user():
     """ Log user out, delete their info from the session """
 
     session['username'] = None
+    session['user_id'] = None
 
     flash("You have logged out. Goodbye!")
     return redirect('/')
@@ -81,6 +82,7 @@ def welcome_login():
         if queried_user.password == password:
             flash("You have successfully logged in!")
             session['username'] = queried_user.username
+            session['user_id'] = queried_user.user_id
             return redirect("/")
         else:
             flash("The password is incorrect. Please try again.")
@@ -179,7 +181,11 @@ def display_search_results():
     """ Displays any results from a recipe search """
 
     search_term = request.args.get('search_term')
-    cleaned_term = search_term[:-1].title()
+
+    if search_term[-1].lower() == "s":
+        cleaned_term = search_term[:-1].title()
+    else:
+        cleaned_term = search_term.title()
 
     search_results_names = Recipe.query.filter(Recipe.recipe_name.like("%{}%".format(cleaned_term))).all()
     search_results_categories = Category.query.filter(Category.category_name.like("%{}%".format(cleaned_term))).all()
@@ -192,6 +198,18 @@ def display_search_results():
                            recipes=search_results_names,
                            categories=search_results_categories,
                            search_term=search_term)
+
+
+@app.route('/preferences/<user_id>')
+def display_user_preferences(user_id):
+    """ Displays user's current dietary preferences & profile information (email,
+        password) & allows users to update or change """
+    user_id = request.args.get('user_id')
+
+    user_prefs = UserPreference.query.filter_by(user_id=user_id).all()
+
+    return render_template("preferences.html",
+                           user_prefs=user_prefs)
 
 
 
