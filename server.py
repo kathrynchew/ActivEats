@@ -230,6 +230,33 @@ def display_user_preferences(user_id):
                            user_info=user_info)
 
 
+@app.route('/preferences/edit', methods=["POST"])
+def edit_user_preferences():
+    """ Updates user's dietary preferences """
+    user_id = session['user_id']
+    new_prefs = request.form.getlist('prefs')
+
+    new_pref_categories = Category.query(Category.category_id).filter(Category.category_name.in_(new_prefs)).all()
+    current_prefs = UserPreference.query.filter_by(user_id=user_id).all()
+    current_pref_categories = UserPreference.query(UserPreference.category_id).filter(UserPreference.user_id == user_id).all()
+
+    for cat_id in new_pref_categories:
+        if cat_id in current_pref_categories:
+            continue
+        else:
+            update_pref = UserPreference(user_id=user_id,
+                                         category_id=cat_id)
+            db.session.add(update_pref)
+
+    for pref in current_prefs:
+        if pref.category.category_name in new_prefs:
+            continue
+        else:
+            db.session.delete(pref)
+
+    db.session.commit()
+
+
 
 ################################################################################
 if __name__ == "__main__":

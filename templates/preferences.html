@@ -3,16 +3,20 @@
 {% block content %}
 <h1>{{ session['username'] }}'s Profile</h1>
 <hr>
-<h3>Dietary Preferences:</h3>
-<ul>
-{% if user_info.preferences|length > 0 %}
-    {% for pref in user_info.preferences %}
-    <li>{{ pref.category.category_name }}</li>
-    {% endfor %}
-{% else %}
-    <li>You have not specified any dietary preferences.</li>
-{% endif %}
+
+<div class="col-sm-4">
+<ul class="list-group">
+  <li class="list-group-item active"><b>DIETARY PREFERENCES:</b> <button id="edit-prefs" type="button" class="btn btn-light btn-sm float-right">Edit</button></li>
+
+    {% if user_info.preferences|length > 0 %}
+        {% for pref in user_info.preferences %}
+            <li class="list-group-item">{{ pref.category.category_name }}</li>
+        {% endfor %}
+    {% else %}
+      <li class="list-group-item">You have not specified any dietary preferences.</li>
+    {% endif %}
 </ul>
+</div>
 <hr>
 <h3>Login Information:</h3>
     <b>username:</b> {{ user_info.username }}<br>
