@@ -7,7 +7,7 @@
 <ul>
 {% if user_prefs|length > 0 %}
     {% for pref in user_prefs %}
-    <li>{{ pref }}</li>
+    <li>{{ pref.category.category_name }}</li>
     {% endfor %}
 {% else %}
     <li>You have not specified any dietary preferences.</li>

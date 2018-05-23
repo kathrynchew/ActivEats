@@ -17,7 +17,7 @@ app.secret_key = "ITS_A_SECRET"
 # ROUTES GO HERE
 
 @app.route('/')
-def display_dietary_preferences():
+def display_featured_recipe():
     """ Home page """
     recipe_id = random.randint(1, 990)
 
@@ -100,14 +100,30 @@ def welcome_register():
     username = request.form.get('username')
     email = request.form.get('email')
     password = request.form.get('password')
+    prefs = request.form.getlist('prefs')
+
+    print prefs
 
     new_user = User(username=username,
                     email=email,
                     password=password)
 
     db.session.add(new_user)
-
     db.session.commit()
+
+    user_prefs = Category.query.filter(Category.category_name.in_(prefs)).all()
+    print user_prefs
+    added_user = User.query.filter_by(email=email).first()
+
+    print added_user
+    print added_user.user_id
+
+    for item in user_prefs:
+        new_pref = UserPreference(user_id=added_user.user_id,
+                                  category_id=item.category_id)
+
+        db.session.add(new_pref)
+        db.session.commit()
 
     flash("You have successfully created an account!")
     return redirect("/")
@@ -204,7 +220,7 @@ def display_search_results():
 def display_user_preferences(user_id):
     """ Displays user's current dietary preferences & profile information (email,
         password) & allows users to update or change """
-    user_id = request.args.get('user_id')
+    # user_id = request.args.get('user_id')
 
     user_prefs = UserPreference.query.filter_by(user_id=user_id).all()
 
