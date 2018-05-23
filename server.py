@@ -125,6 +125,8 @@ def welcome_register():
         db.session.add(new_pref)
         db.session.commit()
 
+    session['username'] = added_user.username
+    session['user_id'] = added_user.user_id
     flash("You have successfully created an account!")
     return redirect("/")
 
@@ -222,10 +224,10 @@ def display_user_preferences(user_id):
         password) & allows users to update or change """
     # user_id = request.args.get('user_id')
 
-    user_prefs = UserPreference.query.filter_by(user_id=user_id).all()
+    user_info = User.query.filter_by(user_id=user_id).first()
 
     return render_template("preferences.html",
-                           user_prefs=user_prefs)
+                           user_info=user_info)
 
 
 

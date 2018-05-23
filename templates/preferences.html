@@ -5,12 +5,16 @@
 <hr>
 <h3>Dietary Preferences:</h3>
 <ul>
-{% if user_prefs|length > 0 %}
-    {% for pref in user_prefs %}
+{% if user_info.preferences|length > 0 %}
+    {% for pref in user_info.preferences %}
     <li>{{ pref.category.category_name }}</li>
     {% endfor %}
 {% else %}
     <li>You have not specified any dietary preferences.</li>
 {% endif %}
 </ul>
+<hr>
+<h3>Login Information:</h3>
+    <b>username:</b> {{ user_info.username }}<br>
+    <b>email address:</b> {{ user_info.email }}
 {% endblock %}
