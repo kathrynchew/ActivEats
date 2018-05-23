@@ -19,8 +19,6 @@ app.secret_key = "ITS_A_SECRET"
 @app.route('/')
 def display_dietary_preferences():
     """ Home page """
-    # recipe = db.session.query(Category.category_name).filter_by(is_preference=True).all()
-    # recipe = Category.query.filter_by(is_preference=True).all()
     recipe_id = random.randint(1, 990)
 
     featured_recipe = Recipe.query.filter_by(recipe_id=recipe_id).first()
@@ -28,13 +26,6 @@ def display_dietary_preferences():
     while not featured_recipe.photo_url:
         recipe_id = random.randint(1, 990)
         featured_recipe = Recipe.query.filter_by(recipe_id=recipe_id).first()
-
-    # for item in recipe:
-    #     # print item.recipe_categories
-    #     for cat in item.recipe_categories:
-    #         # print cat.recipes
-    #         for obj in cat.recipes:
-    #             print obj.recipe_name
 
     return render_template("home.html",
                            recipe=featured_recipe)
@@ -60,6 +51,16 @@ def login_or_register():
     return render_template("login_register.html")
 
 
+@app.route('/logout')
+def logout_user():
+    """ Log user out, delete their info from the session """
+
+    session['username'] = None
+
+    flash("You have logged out. Goodbye!")
+    return redirect('/')
+
+
 @app.route('/welcome', methods=["GET"])
 def welcome_login():
     """ If person attempts to log in to an existing account, assesses if they
@@ -72,13 +73,14 @@ def welcome_login():
     print email
     print password
 
-    query_email = User.query.filter_by(email=email).first()
+    queried_user = User.query.filter_by(email=email).first()
 
-    print query_email
+    print queried_user
 
-    if query_email:
-        if query_email.password == password:
+    if queried_user:
+        if queried_user.password == password:
             flash("You have successfully logged in!")
+            session['username'] = queried_user.username
             return redirect("/")
         else:
             flash("The password is incorrect. Please try again.")
