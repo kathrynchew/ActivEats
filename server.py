@@ -162,40 +162,125 @@ def category_page(category_id):
 @app.route('/my_week')
 def display_current_meal_plan():
     """ If no meal plan currently exists, creates one. If meal plan already
-    exits, displays the current week's meal plan """
+    exits, displays the current week's meal plan
 
-    breakfast_recipes = []
-    lunch_recipes = []
-    dinner_recipes = []
+    Collection attribute 'set_number' is a concat of current year, week of year,
+    i.e. YYYYWW
 
-    breakfast = Category.query.filter(Category.category_name.in_(breakfast_list)).all()
-    lunch = Category.query.filter(Category.category_name.in_(lunch_list)).all()
-    dinner = Category.query.filter(Category.category_name.in_(dinner_list)).all()
+    Collection attribute 'set_day' is a single digit indicating the number of the
+    day of the week to which it corresponds, i.e. 1 == Monday, 2 == Tuesday, etc. """
 
-    for category in breakfast:
-        for recipe in category.recipe_categories:
-            breakfast_recipes.append(recipe.recipes)
+    week = datetime.date.today().strftime("%W")
+    year = datetime.date.today().strftime("%Y")
 
-    for category in lunch:
-        for recipe in category.recipe_categories:
-            lunch_recipes.append(recipe.recipes)
+    set_number = year + week
 
-    for category in dinner:
-        for recipe in category.recipe_categories:
-            dinner_recipes.append(recipe.recipes)
+    if len(Collection.query.filter_by(set_number=set_number).all()) == 0:
 
-    weekly_breakfasts = random.sample(breakfast_recipes, 5)
-    weekly_lunches = random.sample(lunch_recipes, 5)
-    weekly_dinners = random.sample(dinner_recipes, 5)
+        breakfast_recipes = []
+        lunch_recipes = []
+        dinner_recipes = []
 
-    now = datetime.date.today().strftime("%W")
-    print now
+        breakfast = Category.query.filter(Category.category_name.in_(breakfast_list)).all()
+        lunch = Category.query.filter(Category.category_name.in_(lunch_list)).all()
+        dinner = Category.query.filter(Category.category_name.in_(dinner_list)).all()
 
-    return render_template("meal_plan.html",
-                           now=now,
-                           breakfasts=weekly_breakfasts,
-                           lunches=weekly_lunches,
-                           dinners=weekly_dinners)
+        for category in breakfast:
+            for recipe in category.recipe_categories:
+                breakfast_recipes.append(recipe.recipes)
+
+        for category in lunch:
+            for recipe in category.recipe_categories:
+                lunch_recipes.append(recipe.recipes)
+
+        for category in dinner:
+            for recipe in category.recipe_categories:
+                dinner_recipes.append(recipe.recipes)
+
+        weekly_breakfasts = random.sample(breakfast_recipes, 5)
+        weekly_lunches = random.sample(lunch_recipes, 5)
+        weekly_dinners = random.sample(dinner_recipes, 5)
+
+        # Create Collection object from this week's selected breakfast recipes
+        day_num = 0
+
+        for item in weekly_breakfasts:
+            day_num += 1
+
+            breakfast_recipe = Collection(user_id=session['user_id'],
+                                          assigned_date=datetime.date.today(),
+                                          set_number=set_number,
+                                          set_day=day_num,
+                                          meal_type="breakfast",
+                                          recipe_id=item.recipe_id)
+
+            db.session.add(breakfast_recipe)
+
+        # Create Collection object from this week's selected lunch recipes
+        day_num = 0
+
+        for item in weekly_lunches:
+            day_num += 1
+
+            lunch_recipe = Collection(user_id=session['user_id'],
+                                      assigned_date=datetime.date.today(),
+                                      set_number=set_number,
+                                      set_day=day_num,
+                                      meal_type="lunch",
+                                      recipe_id=item.recipe_id)
+
+            db.session.add(lunch_recipe)
+
+        # Create Collection object from this week's selected dinner recipes
+        day_num = 0
+
+        for item in weekly_dinners:
+            day_num += 1
+
+            dinner_recipe = Collection(user_id=session['user_id'],
+                                       assigned_date=datetime.date.today(),
+                                       set_number=set_number,
+                                       set_day=day_num,
+                                       meal_type="dinner",
+                                       recipe_id=item.recipe_id)
+
+            db.session.add(dinner_recipe)
+
+        db.session.commit()
+
+        # return render_template("meal_plan.html",
+        #                        now=week,
+        #                        breakfasts=weekly_breakfasts,
+        #                        lunches=weekly_lunches,
+        #                        dinners=weekly_dinners)
+
+        breakfasts = Collection.query.filter(Collection.set_number == set_number, Collection.meal_type == "breakfast").order_by(Collection.set_day).all()
+        lunches = Collection.query.filter(Collection.set_number == set_number, Collection.meal_type == "lunch").order_by(Collection.set_day).all()
+        dinners = Collection.query.filter(Collection.set_number == set_number, Collection.meal_type == "dinner").order_by(Collection.set_day).all()
+
+        print breakfasts
+
+        return render_template("meal_plan.html",
+                               now=week,
+                               breakfasts=breakfasts,
+                               lunches=lunches,
+                               dinners=dinners)
+
+
+    # If Collection objects already exist for this week's meal plan, query them
+    # and return them with the HTML template
+    else:
+        breakfasts = Collection.query.filter(Collection.set_number == set_number, Collection.meal_type == "breakfast").order_by(Collection.set_day).all()
+        lunches = Collection.query.filter(Collection.set_number == set_number, Collection.meal_type == "lunch").order_by(Collection.set_day).all()
+        dinners = Collection.query.filter(Collection.set_number == set_number, Collection.meal_type == "dinner").order_by(Collection.set_day).all()
+
+        print breakfasts
+
+        return render_template("meal_plan.html",
+                               now=week,
+                               breakfasts=breakfasts,
+                               lunches=lunches,
+                               dinners=dinners)
 
 
 @app.route('/search')
@@ -274,7 +359,7 @@ def edit_user_preferences():
     updated_prefs = User.query.filter_by(user_id=user_id).first()
 
     print updated_prefs
-    # return updated_prefs
+    return jsonify({user_id: updated_prefs})
 
 
 

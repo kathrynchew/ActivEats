@@ -111,3 +111,9 @@ lunch_list = ['Lunch', 'Easy Lunch Recipes', 'Healthy Lunch', 'Main Dish',
 
 dinner_list = ['Healthy Dinner', 'Easy Dinner Recipes', 'Main Dish',
                'Easy Main Dish']
+
+breakfast_nums = [11, 21, 31, 41, 51]
+
+lunch_nums = [12, 22, 32, 42, 52]
+
+dinner_nums = [13, 23, 33, 43, 53]

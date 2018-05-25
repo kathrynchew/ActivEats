@@ -15,20 +15,20 @@
     </tr>
     <tr class="d-flex">
         <th scope="col" class="col-2">Breakfast</th>
-        {% for recipe in breakfasts %}
-        <td class="col-2"><a href='/recipes/{{ recipe.recipe_id }}'>{{ recipe.recipe_name }}</a></td>
+        {% for item in breakfasts %}
+        <td class="col-2"><a href='/recipes/{{ item.recipe.recipe_id }}'>{{ item.recipe.recipe_name }}</a></td>
         {% endfor %}
     </tr>
     <tr class="d-flex">
         <th scope="col" class="col-2">Lunch</th>
-        {% for recipe in lunches %}
-        <td class="col-2"><a href='/recipes/{{ recipe.recipe_id }}'>{{ recipe.recipe_name }}</a></td>
+        {% for item in lunches %}
+        <td class="col-2"><a href='/recipes/{{ item.recipe.recipe_id }}'>{{ item.recipe.recipe_name }}</a></td>
         {% endfor %}
     </tr>
     <tr class="d-flex">
         <th scope="col" class="col-2">Dinner</th>
-        {% for recipe in dinners %}
-        <td class="col-2"><a href='/recipes/{{ recipe.recipe_id }}'>{{ recipe.recipe_name }}</a></td>
+        {% for item in dinners %}
+        <td class="col-2"><a href='/recipes/{{ item.recipe.recipe_id }}'>{{ item.recipe.recipe_name }}</a></td>
         {% endfor %}
     </tr>
 </table>
