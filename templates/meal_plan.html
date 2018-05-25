@@ -1,33 +1,58 @@
 {% extends 'base.html' %}
 {% block title %}My Weekly Meal Plan{% endblock %}
 {% block content %}
-<h1>Week of {{ now.month }}</h1>
-<table>
-    <tr>
-        <th></th>
-        <th>Monday</th>
-        <th>Tuesday</th>
-        <th>Wednesday</th>
-        <th>Thursday</th>
-        <th>Friday</th>
+<h1>{{ session['username'] }}'s Meal Plan</h1>
+<hr>
+<h2>Week of {{ now }}</h2>
+<table class="table table-striped table-dark table-borderless">
+    <tr class="d-flex">
+        <th scope="col" class="col-2"></th>
+        <th scope="col" class="col-2">Monday</th>
+        <th scope="col" class="col-2">Tuesday</th>
+        <th scope="col" class="col-2">Wednesday</th>
+        <th scope="col" class="col-2">Thursday</th>
+        <th scope="col" class="col-2">Friday</th>
     </tr>
-    <tr>
-        <td>Breakfast</td>
+    <tr class="d-flex">
+        <th scope="col" class="col-2">Breakfast</th>
         {% for recipe in breakfasts %}
-        <td><a href='/recipes/{{ recipe.recipe_id }}'>{{ recipe.recipe_name }}</a></td>
+        <td class="col-2"><a href='/recipes/{{ recipe.recipe_id }}'>{{ recipe.recipe_name }}</a></td>
         {% endfor %}
     </tr>
-        <tr>
-        <td>Lunch</td>
+    <tr class="d-flex">
+        <th scope="col" class="col-2">Lunch</th>
         {% for recipe in lunches %}
-        <td><a href='/recipes/{{ recipe.recipe_id }}'>{{ recipe.recipe_name }}</a></td>
+        <td class="col-2"><a href='/recipes/{{ recipe.recipe_id }}'>{{ recipe.recipe_name }}</a></td>
         {% endfor %}
     </tr>
-        <tr>
-        <td>Dinner</td>
+    <tr class="d-flex">
+        <th scope="col" class="col-2">Dinner</th>
         {% for recipe in dinners %}
-        <td><a href='/recipes/{{ recipe.recipe_id }}'>{{ recipe.recipe_name }}</a></td>
+        <td class="col-2"><a href='/recipes/{{ recipe.recipe_id }}'>{{ recipe.recipe_name }}</a></td>
         {% endfor %}
     </tr>
 </table>
+<hr>
+  <div class="col">
+    <div class="card bg-light mb-3">
+      <div class="card-body">
+        <h5 class="card-title shopping-title">Generate & Email Shopping List</h5>
+        <p class="card-text shopping-list">Click the button to generate a shopping list</p>
+        <a href="#" class="btn btn-primary shopping-button">Generate</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ###### JavaScript for Generating & Emailing Shopping List Here ###### -->
+<script type="text/javascript">
+function generateShoppingList(evt) {
+
+    document.querySelector('.shopping-title').innerText = "Shopping List"
+    document.querySelector('.shopping-list').innerHTML = "<ul>{% for item in breakfasts %}<li>{{ item.ingredient_amounts }}</li>{% endfor %}</ul>"
+}
+
+document.querySelector('.shopping-button').addEventListener('click', generateShoppingList)
+
+</script>
 {% endblock %}

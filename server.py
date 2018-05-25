@@ -6,7 +6,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db, Recipe, Ingredient, RecipeIngredient, Category, RecipeCategory, Difficulty, RecipeDifficulty, User, UserPreference, Collection
 from data_cleaning_sets import breakfast_list, lunch_list, dinner_list
 import random
-from datetime import datetime
+import datetime
+import time
 import pdb
 
 app = Flask(__name__)
@@ -187,8 +188,11 @@ def display_current_meal_plan():
     weekly_lunches = random.sample(lunch_recipes, 5)
     weekly_dinners = random.sample(dinner_recipes, 5)
 
+    now = datetime.date.today().strftime("%W")
+    print now
+
     return render_template("meal_plan.html",
-                           now=datetime.utcnow(),
+                           now=now,
                            breakfasts=weekly_breakfasts,
                            lunches=weekly_lunches,
                            dinners=weekly_dinners)
@@ -234,18 +238,29 @@ def display_user_preferences(user_id):
 def edit_user_preferences():
     """ Updates user's dietary preferences """
     user_id = session['user_id']
-    new_prefs = request.form.getlist('prefs')
+    prefs_post = dict(request.form)
+    # new_prefs = request.get_json()
 
-    new_pref_categories = Category.query(Category.category_id).filter(Category.category_name.in_(new_prefs)).all()
+    new_prefs = []
+    for pref in prefs_post['prefs[]']:
+        new_prefs.append(pref)
+
+    print new_prefs
+    # print new_prefs['prefs']
+
+    print "ALL DA BUTTS"
+
+    new_pref_categories = Category.query.filter(Category.category_name.in_(new_prefs)).all()
     current_prefs = UserPreference.query.filter_by(user_id=user_id).all()
-    current_pref_categories = UserPreference.query(UserPreference.category_id).filter(UserPreference.user_id == user_id).all()
+    current_pref_categories = UserPreference.query.filter(UserPreference.user_id == user_id).all()
 
-    for cat_id in new_pref_categories:
-        if cat_id in current_pref_categories:
+    for item in new_pref_categories:
+        print item
+        if item.category_id in current_pref_categories:
             continue
         else:
             update_pref = UserPreference(user_id=user_id,
-                                         category_id=cat_id)
+                                         category_id=item.category_id)
             db.session.add(update_pref)
 
     for pref in current_prefs:
@@ -255,6 +270,11 @@ def edit_user_preferences():
             db.session.delete(pref)
 
     db.session.commit()
+
+    updated_prefs = User.query.filter_by(user_id=user_id).first()
+
+    print updated_prefs
+    # return updated_prefs
 
 
 
@@ -270,6 +290,8 @@ if __name__ == "__main__":
 
     # Use the DebugToolbar
     DebugToolbarExtension(app)
-    DEBUG_TB_INTERCEPT_REDIRECTS = False
+
+    # Stop the Debbugger from freaking out every time there is a redirect
+    app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
     app.run(port=5000, host='0.0.0.0')
