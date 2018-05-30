@@ -176,8 +176,11 @@ def display_current_meal_plan():
 
     set_number = year + week
 
+    user_id = session['user_id']
+
     # If Collection does not already exist for the current week, create one
-    if len(Collection.query.filter_by(set_number=set_number).all()) == 0:
+    if len(Collection.query.filter(Collection.set_number == set_number,
+                                   Collection.user_id == user_id).all()) == 0:
 
         breakfast_recipes = []
         lunch_recipes = []
@@ -250,11 +253,17 @@ def display_current_meal_plan():
 
         db.session.commit()
 
-        breakfasts = Collection.query.filter(Collection.set_number == set_number, Collection.meal_type == "breakfast").order_by(Collection.set_day).all()
-        lunches = Collection.query.filter(Collection.set_number == set_number, Collection.meal_type == "lunch").order_by(Collection.set_day).all()
-        dinners = Collection.query.filter(Collection.set_number == set_number, Collection.meal_type == "dinner").order_by(Collection.set_day).all()
-
-        print breakfasts
+        # Pull this week's Collection objects to pass into the HTML template &
+        # render in the meal plan page
+        breakfasts = Collection.query.filter(Collection.user_id == user_id,
+                                             Collection.set_number == set_number,
+                                             Collection.meal_type == "breakfast").order_by(Collection.set_day).all()
+        lunches = Collection.query.filter(Collection.user_id == user_id,
+                                          Collection.set_number == set_number,
+                                          Collection.meal_type == "lunch").order_by(Collection.set_day).all()
+        dinners = Collection.query.filter(Collection.user_id == user_id,
+                                          Collection.set_number == set_number,
+                                          Collection.meal_type == "dinner").order_by(Collection.set_day).all()
 
         return render_template("meal_plan.html",
                                now=week,
@@ -266,11 +275,15 @@ def display_current_meal_plan():
     # If Collection objects already exist for this week's meal plan, query them
     # and return them with the HTML template
     else:
-        breakfasts = Collection.query.filter(Collection.set_number == set_number, Collection.meal_type == "breakfast").order_by(Collection.set_day).all()
-        lunches = Collection.query.filter(Collection.set_number == set_number, Collection.meal_type == "lunch").order_by(Collection.set_day).all()
-        dinners = Collection.query.filter(Collection.set_number == set_number, Collection.meal_type == "dinner").order_by(Collection.set_day).all()
-
-        print breakfasts
+        breakfasts = Collection.query.filter(Collection.user_id == user_id,
+                                             Collection.set_number == set_number,
+                                             Collection.meal_type == "breakfast").order_by(Collection.set_day).all()
+        lunches = Collection.query.filter(Collection.user_id == user_id,
+                                          Collection.set_number == set_number,
+                                          Collection.meal_type == "lunch").order_by(Collection.set_day).all()
+        dinners = Collection.query.filter(Collection.user_id == user_id,
+                                          Collection.set_number == set_number,
+                                          Collection.meal_type == "dinner").order_by(Collection.set_day).all()
 
         return render_template("meal_plan.html",
                                now=week,
