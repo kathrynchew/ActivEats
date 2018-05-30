@@ -35,7 +35,7 @@
 <hr>
   <div class="col">
     <div class="card bg-light mb-3">
-      <div class="card-body">
+      <div class="card-body" id="shopping-list">
         <h5 class="card-title shopping-title">Generate & Email Shopping List</h5>
         <p class="card-text shopping-list">Click the button to generate a shopping list</p>
         <a href="#" class="btn btn-primary shopping-button">Generate</a>
@@ -44,12 +44,13 @@
   </div>
 </div>
 
+
 <!-- ###### JavaScript for Generating & Emailing Shopping List Here ###### -->
 <script type="text/javascript">
 function generateShoppingList(evt) {
 
     document.querySelector('.shopping-title').innerText = "Shopping List"
-    document.querySelector('.shopping-list').innerHTML = "<ul>{% for item in breakfasts %}<li>{{ item.recipe.ingredient_amounts }}</li>{% endfor %}</ul>"
+    document.querySelector('.shopping-list').innerHTML = '<ul>{% for ingredient in ingredients %}{% if ingredient[1] == 0 %}<li>{{ ingredient[0] }}</li>{% elif ingredient[2] is none %}<li>{{ ingredient[1] }} pieces {{ ingredient[0] }}</li>{% else %}<li>{{ ingredient[1] }} {{ ingredient[2] }}s {{ ingredient[0] }}</li>{% endif %}{% endfor %}</ul>'
 }
 
 document.querySelector('.shopping-button').addEventListener('click', generateShoppingList)

@@ -4,7 +4,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, redirect, request, flash, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db, Recipe, Ingredient, RecipeIngredient, Category, RecipeCategory, Difficulty, RecipeDifficulty, User, UserPreference, Collection
-from data_cleaning_sets import breakfast_list, lunch_list, dinner_list
+from data_cleaning_sets import gram_conversions, breakfast_list, lunch_list, dinner_list
 import random
 import datetime
 import time
@@ -285,11 +285,71 @@ def display_current_meal_plan():
                                           Collection.set_number == set_number,
                                           Collection.meal_type == "dinner").order_by(Collection.set_day).all()
 
+
+
+
+        def fetch_ingredients(collection):
+            """ Unpacks ingredient names, amounts, units for an individual recipe """
+
+            ingredient_list = []
+
+            for key, value in collection.recipe.ingredient_amounts.items():
+                if value is not None:
+                    data = [key, round(float(value), 2)]
+                else:
+                    data = [key, 0]
+                ingredient_list.append(data)
+
+            for item in ingredient_list:
+                if item[0] in collection.recipe.ingredient_units:
+                    item.append(collection.recipe.ingredient_units[item[0]])
+                else:
+                    item.append('N/A')
+
+            return ingredient_list
+
+
+        def consolidate_ingredients():
+
+            total_ingredients = {}
+            meals = [breakfasts, lunches, dinners]
+
+            for meal in meals:
+                for collection in meal:
+                    ingredients = fetch_ingredients(collection)
+                    print ingredients
+                    for lst in ingredients:
+                        if lst[0] in total_ingredients:
+                            total_ingredients[lst[0]][0] += lst[1]
+                            total_ingredients[lst[0]][1].add(lst[2])
+                        else:
+                            total_ingredients[lst[0]] = [lst[1], set([lst[2]])]
+
+            return total_ingredients
+
+
+        def convert_ingredients(total_ingredients):
+            final_ingredients = []
+
+            for key, value in total_ingredients.items():
+                unit = value[1].pop()
+                if unit == 'N/A':
+                    final_ingredients.append([key, value[0], None])
+                else:
+                    final_ingredients.append([key, round((value[0]/gram_conversions[unit]), 2), unit])
+
+            return final_ingredients
+
+
+        total_ingredients = consolidate_ingredients()
+        final_ingredients = convert_ingredients(total_ingredients)
+
         return render_template("meal_plan.html",
                                now=week,
                                breakfasts=breakfasts,
                                lunches=lunches,
-                               dinners=dinners)
+                               dinners=dinners,
+                               ingredients=final_ingredients)
 
 
 @app.route('/search')
@@ -320,7 +380,6 @@ def display_search_results():
 def display_user_profile(user_id):
     """ Displays user's current dietary preferences & profile information (email,
         password, meal plan history) & allows users to update or change """
-    # user_id = request.args.get('user_id')
 
     user_info = User.query.filter_by(user_id=user_id).first()
 
@@ -333,8 +392,6 @@ def display_user_profile(user_id):
             past_plans[recipe.set_number].append(recipe)
         else:
             past_plans[recipe.set_number] = [recipe]
-
-    print past_plans
 
     return render_template("preferences.html",
                            user_info=user_info,
