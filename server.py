@@ -9,6 +9,7 @@ import random
 import datetime
 import time
 import pdb
+import json
 
 app = Flask(__name__)
 
@@ -175,6 +176,7 @@ def display_current_meal_plan():
 
     set_number = year + week
 
+    # If Collection does not already exist for the current week, create one
     if len(Collection.query.filter_by(set_number=set_number).all()) == 0:
 
         breakfast_recipes = []
@@ -248,12 +250,6 @@ def display_current_meal_plan():
 
         db.session.commit()
 
-        # return render_template("meal_plan.html",
-        #                        now=week,
-        #                        breakfasts=weekly_breakfasts,
-        #                        lunches=weekly_lunches,
-        #                        dinners=weekly_dinners)
-
         breakfasts = Collection.query.filter(Collection.set_number == set_number, Collection.meal_type == "breakfast").order_by(Collection.set_day).all()
         lunches = Collection.query.filter(Collection.set_number == set_number, Collection.meal_type == "lunch").order_by(Collection.set_day).all()
         dinners = Collection.query.filter(Collection.set_number == set_number, Collection.meal_type == "dinner").order_by(Collection.set_day).all()
@@ -307,16 +303,29 @@ def display_search_results():
                            search_term=search_term)
 
 
-@app.route('/preferences/<user_id>')
-def display_user_preferences(user_id):
+@app.route('/profile/<user_id>')
+def display_user_profile(user_id):
     """ Displays user's current dietary preferences & profile information (email,
-        password) & allows users to update or change """
+        password, meal plan history) & allows users to update or change """
     # user_id = request.args.get('user_id')
 
     user_info = User.query.filter_by(user_id=user_id).first()
 
+    past_plans = {}
+
+    history = Collection.query.filter_by(user_id=user_id).all()
+
+    for recipe in history:
+        if recipe.set_number in past_plans:
+            past_plans[recipe.set_number].append(recipe)
+        else:
+            past_plans[recipe.set_number] = [recipe]
+
+    print past_plans
+
     return render_template("preferences.html",
-                           user_info=user_info)
+                           user_info=user_info,
+                           past_plans=past_plans)
 
 
 @app.route('/preferences/edit', methods=["POST"])
@@ -358,8 +367,9 @@ def edit_user_preferences():
 
     updated_prefs = User.query.filter_by(user_id=user_id).first()
 
-    print updated_prefs
-    return jsonify({user_id: updated_prefs})
+    print updated_prefs.serialize()
+    # print json.dumps(updated_prefs)
+    return jsonify(updated_prefs.serialize())
 
 
 

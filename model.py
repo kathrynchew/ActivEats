@@ -2,8 +2,25 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects import postgresql
+from sqlalchemy.inspection import inspect
 
 db = SQLAlchemy()
+
+##############################################################################
+# Serializer Mixin
+
+class Serializer(object):
+
+    def serialize(self):
+        # d = {}
+        # for c in inspect(self).attrs.keys():
+        #     d[c] = getattr(self, c)
+        # return d
+        return {c: getattr(self, c) for c in inspect(self).attrs.keys()}
+
+    @staticmethod
+    def serialize_list(l):
+        return [m.serialize() for m in l]
 
 
 ################################################################################
@@ -14,7 +31,7 @@ db = SQLAlchemy()
 ################################################################################
 # RECIPE TABLE
 
-class Recipe(db.Model):
+class Recipe(db.Model, Serializer):
     """ Table for inspecting data directly scraped from Food Network database.
 
     This data is meant to be for sampling, cleaning & informing data modeling;
@@ -47,11 +64,33 @@ class Recipe(db.Model):
 
         return "<Recipe id={}: {}>".format(self.recipe_id, self.recipe_name)
 
+    def serialize(self):
+        """ Return object data in easily serializable format for JSONify """
+        return {
+            'recipe_id': self.recipe_id,
+            'recipe_author': self.recipe_author,
+            'servings_num': self.servings_num,
+            'servings_unit': self.servings_unit,
+            'text_servings': self.text_servings,
+            'special_equipment': self.special_equipment,
+            'text_ingredients': self.text_ingredients,
+            'ingredient_amounts': self.ingredient_amounts,
+            'ingredient_units': self.ingredient_units,
+            'preparation': self.preparation,
+            'total_time': self.total_time,
+            'prep_time': self.prep_time,
+            'cook_time': self.cook_time,
+            'active_time': self.cook_time,
+            'inactive_time': self.inactive_time,
+            'photo_url': self.photo_url,
+            'recipe_url': self.recipe_url
+        }
+
 
 ################################################################################
 # INGREDIENT TABLE
 
-class Ingredient(db.Model):
+class Ingredient(db.Model, Serializer):
     """ Table for attributes of individual ingredients, including 'whole'
     amounts, with spaces left for nutrient information.
 
@@ -79,7 +118,7 @@ class Ingredient(db.Model):
 ################################################################################
 # CATEGORY TAGS TABLE
 
-class Category(db.Model):
+class Category(db.Model, Serializer):
     """ Table for category groupings for each recipe """
 
     __tablename__ = "category_tags"
@@ -100,7 +139,7 @@ class Category(db.Model):
 ################################################################################
 # RECIPE DIFFICULTY TABLE
 
-class Difficulty(db.Model):
+class Difficulty(db.Model, Serializer):
     """ Table for difficulty levels of recipe preparation """
 
     __tablename__ = "difficulty_level"
@@ -118,7 +157,7 @@ class Difficulty(db.Model):
 ############################## ASSOCIATION TABLES ##############################
 ################################################################################
 
-class RecipeIngredient(db.Model):
+class RecipeIngredient(db.Model, Serializer):
     """ Middle table connecting recipes with each ingredient they contain;
     links recipes table (Foreign Key: recipe_id) to
     INGREDIENT_ATTRIBUTES table (Foreign Key: ingredient_id) """
@@ -149,7 +188,7 @@ class RecipeIngredient(db.Model):
                                                           self.ingredient_id)
 
 
-class RecipeCategory(db.Model):
+class RecipeCategory(db.Model, Serializer):
     """ Middle table connecting recipes with each category tag that describes
     them; links recipes table (Foreign Key: recipe_id) to
     CATEGORY table (Foreign Key: category_id) """
@@ -178,7 +217,7 @@ class RecipeCategory(db.Model):
                                                        self.category_id)
 
 
-class RecipeDifficulty(db.Model):
+class RecipeDifficulty(db.Model, Serializer):
     """ Middle table connecting recipes with their respective difficulty level;
     links recipes table (Foreign Key: recipe_id) to DIFFICULTY
     table (Foreign Key: difficulty_id) """
@@ -209,7 +248,7 @@ class RecipeDifficulty(db.Model):
 ################################## USER TABLES #################################
 ################################################################################
 
-class User(db.Model):
+class User(db.Model, Serializer):
     """ Table for individual users """
 
     __tablename__ = "users"
@@ -234,7 +273,20 @@ class User(db.Model):
         return "<User user_id: {}, username: {}>".format(self.user_id,
                                                     self.username)
 
-class UserPreference(db.Model):
+    # def serialize(self):
+    #     return {
+    #         'user_id': self.user_id,
+    #         'username': self.username,
+    #         'email': self.email
+    #     }
+
+    def serialize(self):
+        d = Serializer.serialize(self)
+        del d['password']
+        return d
+
+
+class UserPreference(db.Model, Serializer):
     """ Association table for User dietary preference/category associations
     (category_tags.is_preference == True) """
 
@@ -262,7 +314,7 @@ class UserPreference(db.Model):
                                                          self.user_id)
 
 
-class Collection(db.Model):
+class Collection(db.Model, Serializer):
     """ Table for collecting all recipes served to a given user sorted by date
     and groupings of the set of other recipes for the same week's meal plan """
 
@@ -295,6 +347,8 @@ class Collection(db.Model):
                                                                              self.set_number,
                                                                              self.set_day,
                                                                              self.meal_type)
+
+
 
 
 

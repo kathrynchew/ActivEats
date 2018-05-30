@@ -49,7 +49,7 @@
 function generateShoppingList(evt) {
 
     document.querySelector('.shopping-title').innerText = "Shopping List"
-    document.querySelector('.shopping-list').innerHTML = "<ul>{% for item in breakfasts %}<li>{{ item.ingredient_amounts }}</li>{% endfor %}</ul>"
+    document.querySelector('.shopping-list').innerHTML = "<ul>{% for item in breakfasts %}<li>{{ item.recipe.ingredient_amounts }}</li>{% endfor %}</ul>"
 }
 
 document.querySelector('.shopping-button').addEventListener('click', generateShoppingList)

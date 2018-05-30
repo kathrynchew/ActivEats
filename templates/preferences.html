@@ -21,6 +21,73 @@
 <h3>Login Information:</h3>
     <b>username:</b> {{ user_info.username }}<br>
     <b>email address:</b> {{ user_info.email }}
+<hr>
+<h3>Meal Plan History:</h3>
+
+
+<div class="accordion" id="accordionExample">
+
+  {% for week in past_plans.items()|sort(reverse = True) %}
+
+  <div class="card">
+    <div class="card-header" id="heading{{ week[0] }}">
+      <h5 class="mb-0">
+        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ week[0] }}" aria-expanded="true" aria-controls="collapse{{ week[0] }}">
+          Meal Plan {{ week[0] }}
+        </button>
+      </h5>
+    </div>
+
+    <div id="collapse{{ week[0] }}" class="collapse" aria-labelledby="heading{{ week[0] }}" data-parent="#accordionExample">
+      <div class="card-body">
+       <!-- {{ past_plans[week] }} -->
+
+       <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col">Monday</th>
+                  <th scope="col">Tuesday</th>
+                  <th scope="col">Wednesday</th>
+                  <th scope="col">Thursday</th>
+                  <th scope="col">Friday</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Breakfast</th>
+                  {% for meal in week[1] %}
+                  {% if meal.meal_type == 'breakfast' %}
+                  <td><a href='/recipes/{{ meal.recipe_id }}'>{{ meal.recipe.recipe_name }}</a></td>
+                  {% endif %}
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <th scope="row">Lunch</th>
+                  {% for meal in week[1] %}
+                  {% if meal.meal_type == 'lunch' %}
+                  <td><a href='/recipes/{{ meal.recipe_id }}'>{{ meal.recipe.recipe_name }}</a></td>
+                  {% endif %}
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <th scope="row">Dinner</th>
+                  {% for meal in week[1] %}
+                  {% if meal.meal_type == 'dinner' %}
+                  <td><a href='/recipes/{{ meal.recipe_id }}'>{{ meal.recipe.recipe_name }}</a></td>
+                  {% endif %}
+                  {% endfor %}
+                </tr>
+
+              </tbody>
+          </table>
+      </div>
+    </div>
+  </div>
+
+  {% endfor %}
+
+</div>
 
 <script type="text/javascript">
 let $jq = jQuery.noConflict();
