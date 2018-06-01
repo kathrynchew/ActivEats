@@ -1,0 +1,9 @@
+/* Some extra non-bootstrap CSS for ActivEats */
+
+/* Enable responsive columns (shopping lists) */
+
+#article {
+    -webkit-column-count: 2;
+       -moz-column-count: 2;
+            column-count: 2;
+}

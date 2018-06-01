@@ -5,6 +5,7 @@ from flask import Flask, render_template, redirect, request, flash, session, jso
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db, Recipe, Ingredient, RecipeIngredient, Category, RecipeCategory, Difficulty, RecipeDifficulty, User, UserPreference, Collection
 from data_cleaning_sets import gram_conversions, breakfast_list, lunch_list, dinner_list
+from operator import itemgetter
 import random
 import datetime
 import time
@@ -317,7 +318,7 @@ def display_current_meal_plan():
             for meal in meals:
                 for collection in meal:
                     ingredients = fetch_ingredients(collection)
-                    print ingredients
+                    # print ingredients
                     for lst in ingredients:
                         if lst[0] in total_ingredients:
                             total_ingredients[lst[0]][0] += lst[1]
@@ -338,7 +339,9 @@ def display_current_meal_plan():
                 else:
                     final_ingredients.append([key, round((value[0]/gram_conversions[unit]), 2), unit])
 
-            return final_ingredients
+            # print final_ingredients.sort(key=itemgetter(0))
+            return sorted(final_ingredients)
+            # return final_ingredients
 
 
         total_ingredients = consolidate_ingredients()
@@ -435,11 +438,16 @@ def edit_user_preferences():
 
     db.session.commit()
 
-    updated_prefs = User.query.filter_by(user_id=user_id).first()
+    # Fetch new preferences to return & populate in success function
+    updated_pref_ids = db.session.query(UserPreference.category_id).filter_by(user_id=user_id).all()
+    updated_pref_names = db.session.query(Category.category_name).filter(Category.category_id.in_(updated_pref_ids)).all()
 
-    print updated_prefs.serialize()
-    # print json.dumps(updated_prefs)
-    return jsonify(updated_prefs.serialize())
+    # print jsonify({"prefs": updated_pref_names})
+    # return jsonify({"prefs": updated_pref_names})
+    # print str(updated_pref_names)
+    # return str(updated_pref_names)
+
+    return jsonify(render_template('fetched_preferences.html', new_prefs=updated_pref_names))
 
 
 

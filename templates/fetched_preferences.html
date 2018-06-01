@@ -1,0 +1,13 @@
+{% block content %}
+<li class="list-group-item active">
+    <b>DIETARY PREFERENCES:</b>
+    <button id="edit-prefs" type="button" class="btn btn-light btn-sm float-right">Edit</button>
+</li>
+{% if new_prefs|length > 0 %}
+    {% for pref in new_prefs %}
+        <li class="list-group-item">{{ pref[0] }}</li>
+    {% endfor %}
+{% else %}
+    <li class="list-group-item">You have not specified any dietary preferences.</li>
+{% endif %}
+{% endblock %}
