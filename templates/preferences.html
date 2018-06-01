@@ -100,7 +100,6 @@ function editPreferences(evt) {
 }
 
 function submitPreferences(evt) {
-    console.log('butt worm');
     evt.preventDefault();
 
     let prefs = []
@@ -108,31 +107,18 @@ function submitPreferences(evt) {
         prefs.push($(this).val());
     });
 
-    console.log(prefs);
-
     $jq.post("/preferences/edit", {'prefs': prefs}, displayPreferences);
 }
 
 
 function displayPreferences(results) {
-
-    console.log("ONE LAST BUTTS");
-    console.log(results);
-    // let new_prefs = JSON.parse(results);
     let new_prefs = results;
-    console.log(new_prefs);
 
-    // document.querySelector("#pref-stuff").innerHTML = '<li class="list-group-item active"><b>DIETARY PREFERENCES:</b> <button id="edit-prefs" type="button" class="btn btn-light btn-sm float-right">Edit</button></li>{% if' +  new_prefs + '|length > 0 %}{% for pref in' + new_prefs + '%}<li class="list-group-item">{{ pref }}</li>{% endfor %}{% else %}<li class="list-group-item">You have not specified any dietary preferences.</li>{% endif %}';
     document.querySelector("#pref-stuff").innerHTML = new_prefs;
-    console.log("Gee Golly Jeepers!");
-
-    document.querySelector("#editPrefs").addEventListener('click', editPreferences);
+    document.querySelector("#edit-prefs").addEventListener('click', editPreferences);
 }
 
-console.log("BRO");
-
 document.querySelector("#editPrefs").addEventListener('click', editPreferences);
-console.log("YOOOOOOOOBRO");
 
 </script>
 {% endblock %}

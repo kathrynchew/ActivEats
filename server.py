@@ -5,7 +5,7 @@ from flask import Flask, render_template, redirect, request, flash, session, jso
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db, Recipe, Ingredient, RecipeIngredient, Category, RecipeCategory, Difficulty, RecipeDifficulty, User, UserPreference, Collection
 from data_cleaning_sets import gram_conversions, breakfast_list, lunch_list, dinner_list
-from operator import itemgetter
+import ingredients
 import random
 import datetime
 import time
@@ -186,24 +186,42 @@ def display_current_meal_plan():
         breakfast_recipes = []
         lunch_recipes = []
         dinner_recipes = []
+        user_prefs = []
 
         breakfast = Category.query.filter(Category.category_name.in_(breakfast_list)).all()
         lunch = Category.query.filter(Category.category_name.in_(lunch_list)).all()
         dinner = Category.query.filter(Category.category_name.in_(dinner_list)).all()
 
+        prefs = db.session.query(UserPreference.category_id).filter(UserPreference.user_id == user_id).all()
+        for pref in prefs:
+            user_prefs.append(pref[0])
+
         for category in breakfast:
             for recipe in category.recipe_categories:
-                breakfast_recipes.append(recipe.recipes)
+                for other_cat in recipe.recipes.recipe_categories:
+                    if other_cat.category_id in user_prefs:
+                        breakfast_recipes.append(recipe.recipes)
 
         for category in lunch:
             for recipe in category.recipe_categories:
-                lunch_recipes.append(recipe.recipes)
+                for other_cat in recipe.recipes.recipe_categories:
+                    if other_cat.category_id in user_prefs:
+                        lunch_recipes.append(recipe.recipes)
 
         for category in dinner:
             for recipe in category.recipe_categories:
-                dinner_recipes.append(recipe.recipes)
+                for other_cat in recipe.recipes.recipe_categories:
+                    if other_cat.category_id in user_prefs:
+                        dinner_recipes.append(recipe.recipes)
 
-        weekly_breakfasts = random.sample(breakfast_recipes, 5)
+        if len(breakfast_recipes) < 5:
+            multiply_breakfasts = []
+            while len(multiply_breakfasts) < 5:
+                for item in breakfast_recipes:
+                    multiply_breakfasts.append(item)
+            weekly_breakfasts = random.sample(multiply_breakfasts, 5)
+        else:
+            weekly_breakfasts = random.sample(breakfast_recipes, 5)
         weekly_lunches = random.sample(lunch_recipes, 5)
         weekly_dinners = random.sample(dinner_recipes, 5)
 
@@ -266,11 +284,15 @@ def display_current_meal_plan():
                                           Collection.set_number == set_number,
                                           Collection.meal_type == "dinner").order_by(Collection.set_day).all()
 
+        # Get shopping list using Ingredients module
+        final_ingredients = ingredients.get_shopping_list(breakfasts, lunches, dinners)
+
         return render_template("meal_plan.html",
                                now=week,
                                breakfasts=breakfasts,
                                lunches=lunches,
-                               dinners=dinners)
+                               dinners=dinners,
+                               ingredients=final_ingredients)
 
 
     # If Collection objects already exist for this week's meal plan, query them
@@ -286,66 +308,8 @@ def display_current_meal_plan():
                                           Collection.set_number == set_number,
                                           Collection.meal_type == "dinner").order_by(Collection.set_day).all()
 
-
-
-
-        def fetch_ingredients(collection):
-            """ Unpacks ingredient names, amounts, units for an individual recipe """
-
-            ingredient_list = []
-
-            for key, value in collection.recipe.ingredient_amounts.items():
-                if value is not None:
-                    data = [key, round(float(value), 2)]
-                else:
-                    data = [key, 0]
-                ingredient_list.append(data)
-
-            for item in ingredient_list:
-                if item[0] in collection.recipe.ingredient_units:
-                    item.append(collection.recipe.ingredient_units[item[0]])
-                else:
-                    item.append('N/A')
-
-            return ingredient_list
-
-
-        def consolidate_ingredients():
-
-            total_ingredients = {}
-            meals = [breakfasts, lunches, dinners]
-
-            for meal in meals:
-                for collection in meal:
-                    ingredients = fetch_ingredients(collection)
-                    # print ingredients
-                    for lst in ingredients:
-                        if lst[0] in total_ingredients:
-                            total_ingredients[lst[0]][0] += lst[1]
-                            total_ingredients[lst[0]][1].add(lst[2])
-                        else:
-                            total_ingredients[lst[0]] = [lst[1], set([lst[2]])]
-
-            return total_ingredients
-
-
-        def convert_ingredients(total_ingredients):
-            final_ingredients = []
-
-            for key, value in total_ingredients.items():
-                unit = value[1].pop()
-                if unit == 'N/A':
-                    final_ingredients.append([key, value[0], None])
-                else:
-                    final_ingredients.append([key, round((value[0]/gram_conversions[unit]), 2), unit])
-
-            # print final_ingredients.sort(key=itemgetter(0))
-            return sorted(final_ingredients)
-            # return final_ingredients
-
-
-        total_ingredients = consolidate_ingredients()
-        final_ingredients = convert_ingredients(total_ingredients)
+        # Generate shopping list using Ingredients module
+        final_ingredients = ingredients.get_shopping_list(breakfasts, lunches, dinners)
 
         return render_template("meal_plan.html",
                                now=week,
@@ -378,6 +342,9 @@ def display_search_results():
                            categories=search_results_categories,
                            search_term=search_term)
 
+################################################################################
+########################### USER PERSONALIZED ROUTES ###########################
+################################################################################
 
 @app.route('/profile/<user_id>')
 def display_user_profile(user_id):
@@ -404,25 +371,27 @@ def display_user_profile(user_id):
 @app.route('/preferences/edit', methods=["POST"])
 def edit_user_preferences():
     """ Updates user's dietary preferences """
+    # Get info from newly submitted form (plus session user_id)
     user_id = session['user_id']
     prefs_post = dict(request.form)
-    # new_prefs = request.get_json()
 
+    # Unpack individual preferences from POST request responses
     new_prefs = []
     for pref in prefs_post['prefs[]']:
         new_prefs.append(pref)
 
-    print new_prefs
-    # print new_prefs['prefs']
-
-    print "ALL DA BUTTS"
-
+    # Query database to get comparable lists of categories to allow matching of
+    # new preferences against old preferences
     new_pref_categories = Category.query.filter(Category.category_name.in_(new_prefs)).all()
     current_prefs = UserPreference.query.filter_by(user_id=user_id).all()
     current_pref_categories = UserPreference.query.filter(UserPreference.user_id == user_id).all()
 
+    #-- Compare old vs. new preferences --#
+    # If an preference is in the new list but not in the old, create a new
+    # UserPreference object in the database. If a preference is in the old list
+    # but not in the new, delete the corresponding UserPreference object from
+    # the database
     for item in new_pref_categories:
-        print item
         if item.category_id in current_pref_categories:
             continue
         else:
@@ -442,11 +411,8 @@ def edit_user_preferences():
     updated_pref_ids = db.session.query(UserPreference.category_id).filter_by(user_id=user_id).all()
     updated_pref_names = db.session.query(Category.category_name).filter(Category.category_id.in_(updated_pref_ids)).all()
 
-    # print jsonify({"prefs": updated_pref_names})
-    # return jsonify({"prefs": updated_pref_names})
-    # print str(updated_pref_names)
-    # return str(updated_pref_names)
-
+    # Use jinja to dynamically render html formatting for new prefs & feed
+    # html back to template using AJAX call
     return jsonify(render_template('fetched_preferences.html', new_prefs=updated_pref_names))
 
 
