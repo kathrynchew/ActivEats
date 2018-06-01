@@ -64,21 +64,16 @@ def logout_user():
     return redirect('/')
 
 
-@app.route('/welcome', methods=["GET"])
+@app.route('/welcome/login', methods=["POST"])
 def welcome_login():
     """ If person attempts to log in to an existing account, assesses if they
     have an account. If so, logs them in. If not, flashes a message to alert
     user to register or re-enter credentials correctly """
 
-    email = request.args.get('email')
-    password = request.args.get('password')
-
-    print email
-    print password
+    email = request.form.get('email')
+    password = request.form.get('password')
 
     queried_user = User.query.filter_by(email=email).first()
-
-    print queried_user
 
     if queried_user:
         if queried_user.password == password:

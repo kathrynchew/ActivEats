@@ -15,7 +15,7 @@
             </ul>
         </div>
       <div class="card-body">
-        <form id="all-login" action="/welcome" method="GET">
+        <form id="all-login" action="/welcome/login" method="POST">
             <div class="form-group">
                 <label for="exampleInputEmail1">Email Address</label>
                 <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" name="email">
@@ -45,7 +45,7 @@ function clickLogIn(evt) {
 
     document.querySelector("#login-register-tabs").innerHTML = "<ul class='nav nav-tabs card-header-tabs'><li class='nav-item'><a class='nav-link active' id='login-tab' href='#'>Log In</a></li><li class='nav-item'><a class='nav-link' id='register-tab' href='#''>Create New Account</a></li></ul>";
 
-    document.querySelector(".card-body").innerHTML = '<form id="all-login" action="/welcome" method="GET"><div class="form-group"><label for="exampleInputEmail1">Email Address</label><input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" name="email"></div><div class="form-group" id="inputPassword"><label for="exampleInputPassword1">Password</label><input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" name="password"></div><button type="submit" class="btn btn-primary">Submit</button></form>';
+    document.querySelector(".card-body").innerHTML = '<form id="all-login" action="/welcome/login" method="POST"><div class="form-group"><label for="exampleInputEmail1">Email Address</label><input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" name="email"></div><div class="form-group" id="inputPassword"><label for="exampleInputPassword1">Password</label><input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" name="password"></div><button type="submit" class="btn btn-primary">Submit</button></form>';
 
     document.querySelector("#register-tab").addEventListener('click', clickCreateNewAccount);
 }

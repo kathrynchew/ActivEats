@@ -30,10 +30,10 @@
   {% for week in past_plans.items()|sort(reverse = True) %}
 
   <div class="card">
-    <div class="card-header" id="heading{{ week[0] }}">
+    <div class="card-header bg-primary text-light" id="heading{{ week[0] }}" data-toggle="collapse" data-target="#collapse{{ week[0] }}" aria-expanded="true" aria-controls="collapse{{ week[0] }}">
       <h5 class="mb-0">
-        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ week[0] }}" aria-expanded="true" aria-controls="collapse{{ week[0] }}">
-          Meal Plan {{ week[0] }}
+        <button class="btn btn-link text-light" type="button" data-toggle="collapse" data-target="#collapse{{ week[0] }}" aria-expanded="true" aria-controls="collapse{{ week[0] }}">
+          <b>MEAL PLAN {{ week[0] }}</b>
         </button>
       </h5>
     </div>
