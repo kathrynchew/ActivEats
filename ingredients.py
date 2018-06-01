@@ -2,7 +2,8 @@
 from data_cleaning_sets import gram_conversions
 
 def fetch_ingredients(collection):
-    """ Unpacks ingredient names, amounts, units for an individual recipe """
+    """ Unpacks ingredient names, amounts, units for an individual Collection 
+    object (each Collection object contains only one recipe) """
 
     ingredient_list = []
 
@@ -62,3 +63,20 @@ def get_shopping_list(breakfasts,lunches,dinners):
     final_ingredients = convert_ingredients(total_ingredients)
 
     return final_ingredients
+
+
+def get_single_shopping_list(recipe):
+    """ Consolidates ingredients from a single Recipe object into a list of
+    lists, each sublist containing ingredient name, quantity in grams, and unit 
+    values. Returns a list of lists with the following indices:
+
+    [0] ingredient name (str)
+    [1] quantity in grams (float)
+    [2] units value (str) """
+    total_ingredients = []
+
+    for key, value in recipe.ingredient_amounts.items():
+        unit = recipe.ingredient_units[key]
+        total_ingredients.append([key, round((value/gram_conversions[unit]), 2), unit])
+
+    return total_ingredients

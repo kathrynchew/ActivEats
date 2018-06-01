@@ -71,7 +71,7 @@ function generateShoppingList(evt) {
     // let ingredients = "{{ recipe_text.recipe_ingredients }}";
     // console.log(ingredients);
     document.querySelector('.shopping-title').innerText = "Shopping List"
-    document.querySelector('.shopping-list').innerHTML = "<ul>{% for item in recipe_text.recipe_ingredients %}<li>{{item.ingredient_attribute.ingredient_name }}</li>{% endfor %}</ul>"
+    document.querySelector('.shopping-list').innerHTML = "<ul>{% for item in shopping_list %}<li>{{ item[1] }} {{ item[2] }} {{ item[0] }}</li>{% endfor %}</ul>"
 }
 
 document.querySelector('.shopping-button').addEventListener('click', generateShoppingList)

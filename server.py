@@ -10,7 +10,6 @@ import random
 import datetime
 import time
 import pdb
-import json
 
 app = Flask(__name__)
 
@@ -148,8 +147,11 @@ def recipe_page(recipe_id):
     """ Display the contents of a specific recipe """
     recipe_info = Recipe.query.filter_by(recipe_id=recipe_id).first()
 
+    shopping_list = ingredients.get_single_shopping_list(recipe_info)
+
     return render_template("display_recipe.html",
-                           recipe_text=recipe_info)
+                           recipe_text=recipe_info,
+                           shopping_list=shopping_list)
 
 
 @app.route('/categories/<category_id>')
