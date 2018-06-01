@@ -5,6 +5,7 @@ from flask import Flask, render_template, redirect, request, flash, session, jso
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db, Recipe, Ingredient, RecipeIngredient, Category, RecipeCategory, Difficulty, RecipeDifficulty, User, UserPreference, Collection
 from data_cleaning_sets import gram_conversions, breakfast_list, lunch_list, dinner_list
+from isoweek import Week
 import ingredients
 import random
 import datetime
@@ -170,7 +171,15 @@ def display_current_meal_plan():
     day of the week to which it corresponds, i.e. 1 == Monday, 2 == Tuesday, etc. """
 
     week = datetime.date.today().strftime("%W")
+    thisweek = Week.thisweek().week
     year = datetime.date.today().strftime("%Y")
+    start_date = datetime.datetime.strptime(year + "-W" + str(thisweek) + "-1", "%Y-W%W-%w")
+    start_day = start_date.strftime("%b %d, %Y")
+
+    print "isoweek"
+    print thisweek
+    print "week"
+    print week
 
     set_number = year + week
 
@@ -289,7 +298,8 @@ def display_current_meal_plan():
                                breakfasts=breakfasts,
                                lunches=lunches,
                                dinners=dinners,
-                               ingredients=final_ingredients)
+                               ingredients=final_ingredients,
+                               start_day=start_day)
 
 
     # If Collection objects already exist for this week's meal plan, query them
@@ -313,7 +323,8 @@ def display_current_meal_plan():
                                breakfasts=breakfasts,
                                lunches=lunches,
                                dinners=dinners,
-                               ingredients=final_ingredients)
+                               ingredients=final_ingredients,
+                               start_day=start_day)
 
 
 @app.route('/search')
