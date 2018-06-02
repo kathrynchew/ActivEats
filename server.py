@@ -3,9 +3,14 @@
 from jinja2 import StrictUndefined
 from flask import Flask, render_template, redirect, request, flash, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
-from model import connect_to_db, db, Recipe, Ingredient, RecipeIngredient, Category, RecipeCategory, Difficulty, RecipeDifficulty, User, UserPreference, Collection
-from data_cleaning_sets import gram_conversions, breakfast_list, lunch_list, dinner_list
+from model import (connect_to_db, db, Recipe, Ingredient, RecipeIngredient,
+                   Category, RecipeCategory, Difficulty, RecipeDifficulty, User,
+                   UserPreference, Collection)
+from data_cleaning_sets import (gram_conversions, breakfast_list, lunch_list,
+                                dinner_list)
+from flask_mail import Mail, Message
 from isoweek import Week
+import os
 import ingredients
 import random
 import datetime
@@ -15,6 +20,16 @@ import pdb
 app = Flask(__name__)
 
 app.secret_key = "ITS_A_SECRET"
+
+# APP CONFIG SETTINGS FOR FLASK-MAIL
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = os.environ['MAIL_USERNAME']
+app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD']
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+
+mail = Mail(app)
 
 ################################################################################
 # ROUTES GO HERE
@@ -350,6 +365,24 @@ def display_search_results():
                            categories=search_results_categories,
                            search_term=search_term)
 
+
+################################################################################
+############################# EMAIL SHOPPING LISTS #############################
+################################################################################
+
+@app.route("/send", methods=["POST"])
+def send_mail():
+    user_email = User.query.filter_by(user_id=session['user_id']).first().email
+
+    shopping_contents = dict(request.form)
+
+    msg = Message('Hello',
+                  sender=os.environ['MAIL_USERNAME'],
+                  recipients=[user_email])
+    msg.body = "This is a test email: {}".format(shopping_contents['recipe_name'])
+    mail.send(msg)
+    return "Sent"
+
 ################################################################################
 ########################### USER PERSONALIZED ROUTES ###########################
 ################################################################################
@@ -424,7 +457,8 @@ def edit_user_preferences():
     return jsonify(render_template('fetched_preferences.html', new_prefs=updated_pref_names))
 
 
-
+################################################################################
+################################ APP.CONFIG INFO ###############################
 ################################################################################
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
@@ -435,10 +469,18 @@ if __name__ == "__main__":
 
     connect_to_db(app)
 
-    # Use the DebugToolbar
+    # Use the DebugToolbar  
     DebugToolbarExtension(app)
 
     # Stop the Debbugger from freaking out every time there is a redirect
     app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+
+    # # APP CONFIG SETTINGS FOR FLASK-MAIL
+    # app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+    # app.config['MAIL_PORT'] = 465
+    # app.config['MAIL_USERNAME'] = os.environ['MAIL_USERNAME']
+    # app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD']
+    # app.config['MAIL_USE_TLS'] = False
+    # app.config['MAIL_USE_SSL'] = True
 
     app.run(port=5000, host='0.0.0.0')

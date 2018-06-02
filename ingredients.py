@@ -76,7 +76,10 @@ def get_single_shopping_list(recipe):
     total_ingredients = []
 
     for key, value in recipe.ingredient_amounts.items():
-        unit = recipe.ingredient_units[key]
-        total_ingredients.append([key, round((value/gram_conversions[unit]), 2), unit])
+        if key in recipe.ingredient_units:
+            unit = recipe.ingredient_units[key]
+            total_ingredients.append([key, round((float(value)/gram_conversions[unit]), 2), unit])
+        else:
+            total_ingredients.append([key, value, None])
 
     return total_ingredients

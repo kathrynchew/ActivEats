@@ -5,7 +5,7 @@
 <h1>Here's a Full Recipe</h1>
 <div class="row">
   <div class="col-sm-6">
-<h3>{{ recipe_text.recipe_name }}</h3>
+<h3 id="recipe-name">{{ recipe_text.recipe_name }}</h3>
 {% if recipe_text.recipe_author is not none %}
 by {{ recipe_text.recipe_author }}
 {% endif %}
@@ -44,7 +44,7 @@ by {{ recipe_text.recipe_author }}
       <div class="card-body">
         <h5 class="card-title shopping-title">Generate Shopping List</h5>
         <p class="card-text shopping-list">Click the button to generate a shopping list for this recipe</p>
-        <a href="#" class="btn btn-primary shopping-button">Generate</a>
+        <a href="#" class="btn btn-primary shopping-button">Generate</a><div id="email-results"></div>
       </div>
     </div>
   </div>
@@ -67,14 +67,35 @@ by {{ recipe_text.recipe_author }}
 <a href="{{ recipe_text.recipe_url }}">Click</a> to view original.
 
 <script type="text/javascript">
+let $jq = jQuery.noConflict();
+
+function emailSentConfirm(results) {
+    let emailStatus = results;
+    document.querySelector('#email-results').innerText = "&nbsp;&nbsp; Email Successful";
+}
+
+function emailShoppingList(evt) {
+    let listContent = document.querySelector('.shopping-list').innerText;
+    let recipeName = document.querySelector('#recipe-name').innerText;
+    console.log(listContent);
+    $jq.post("/send",
+             {'list_content': listContent,
+              'recipe_name': recipeName},
+             emailSentConfirm);
+}
+
 function generateShoppingList(evt) {
     // let ingredients = "{{ recipe_text.recipe_ingredients }}";
     // console.log(ingredients);
-    document.querySelector('.shopping-title').innerText = "Shopping List"
-    document.querySelector('.shopping-list').innerHTML = "<ul>{% for item in shopping_list %}<li>{{ item[1] }} {{ item[2] }} {{ item[0] }}</li>{% endfor %}</ul>"
+    document.querySelector('.shopping-title').innerText = "Shopping List";
+    document.querySelector('.shopping-list').innerHTML = "<ul>{% for item in shopping_list %}<li>{{ item[1] }} {{ item[2] }} {{ item[0] }}</li>{% endfor %}</ul>";
+    document.querySelector('.shopping-button').innerText = "Email This List";
+    document.querySelector('.shopping-button').setAttribute('id', 'email-button');
+
+    document.querySelector('#email-button').addEventListener('click', emailShoppingList);
 }
 
-document.querySelector('.shopping-button').addEventListener('click', generateShoppingList)
-
+document.querySelector('.shopping-button').addEventListener('click', generateShoppingList);
+console.log("WHY OH WHY");
 </script>
 {% endblock %}
