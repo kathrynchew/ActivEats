@@ -62,7 +62,7 @@ class Recipe(db.Model, Serializer):
     def __repr__(self):
         """ Representative model for recipe items """
 
-        return "<Recipe id={}: {}>".format(self.recipe_id, self.recipe_name)
+        return "<Recipe id={}: {}>".format(self.recipe_id, self.recipe_name.encode('ascii', 'ignore'))
 
     def serialize(self):
         """ Return object data in easily serializable format for JSONify """

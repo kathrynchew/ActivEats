@@ -10,10 +10,25 @@ from sqlalchemy.dialects.postgresql import array, ARRAY, JSON
 from sqlalchemy.sql.functions import Cast
 from data_cleaning_sets import measure_names, descriptors, fractions, gram_conversions, fraction_conversions, accepted_units, accepted_measures, category_preferences
 
+# Collect all recipe files:
+data_files = ["data/recipe_files/all_recipes_jsontest.json",
+              "data/recipe_files/all_recipes_1.json",
+              "data/recipe_files/all_recipes_2-3.json",
+              "data/recipe_files/all_recipes_4-5.json",
+              "data/recipe_files/all_recipes_6-7.json",
+              "data/recipe_files/all_recipes_8-9.json",
+              "data/recipe_files/all_recipes_10-11.json",
+              "data/recipe_files/all_recipes_12-13.json",
+              "data/recipe_files/all_recipes_14-15.json",
+              "data/recipe_files/all_recipes_16-17.json",
+              "data/recipe_files/all_recipes_18-19.json",
+              "data/recipe_files/all_recipes_20-21.json"]
 
-# Open JSON file & parse lines
-with open("data/recipe_files/all_recipes_jsontest.json") as file:
-    recipe_lines = json.load(file)
+
+# # Open JSON file & parse lines
+# for data_file in data_files:
+#     with open(data_file) as file:
+#         recipe_lines = json.load(file)
 
 ################################################################################
 ################################# LOAD RECIPES #################################
@@ -23,10 +38,6 @@ def load_recipes():
 
     print "Adding Recipes"
 
-    # Delete all rows in table, so sample table can be created repeatedly with
-    # new data and no duplicates
-    # Recipe.query.delete()
-
     urls_plus_ingredients = {}
     qty_data = set()
     urls_plus_categories = {}
@@ -34,278 +45,297 @@ def load_recipes():
     urls_plus_difficulty = {}
     difficulty_types = set()
 
-    for line in recipe_lines:
-        if line['url'] == "http://www.foodnetwork.com/error-page/500":
-            pass
-        else:
-            url = line['url']
-            difficulty = "".join(line['difficulty'])
-            recipe_name = line['recipe_name']
+    for data_file in data_files:
+        print "warwick"
+        with open(data_file) as file:
+            recipe_lines = json.load(file)
 
+        # Delete all rows in table, so sample table can be created repeatedly with
+        # new data and no duplicates
+        # Recipe.query.delete()
 
-            ########################################################################
-            # CATEGORY TAGS: Transfer scraped category arrays to a set to return
-            # for further processing in LOAD_TAGS function.
-
-            urls_plus_categories[url] = set()
-
-            for item in line['category_tags']:
-                if len(item) > 0:
-                    raw_tags.add(item)
-                    urls_plus_categories[url].add(item)
-
-            ########################################################################
-            # DIFFICULTY LEVELS: Transfer scraped difficulty strings to a set to return
-            # for further processing in LOAD_DIFFICULTY function.
-
-            if difficulty != 'N/A':
-                urls_plus_difficulty[url] = difficulty
-                difficulty_types.add(difficulty)
-
-
-            ########################################################################
-            # SERVINGS: Split servings strings into 2 columns: servings_num (integer)
-            # and servings_unit (text of serving unit/quantity)
-
-            servings = line['servings']
-            text_servings = line['servings']
-
-            if servings == 'N/A':
-                servings_unit = None
-                servings_num = None
-                text_servings = None
-
+        for line in recipe_lines:
+            if line['url'] == "http://www.foodnetwork.com/error-page/500":
+                pass
             else:
-                servings = re.sub(r" ?\([^)]+\)", "", servings)
-                num = [i for i in servings.split() if i.isnumeric()]
-                unit = [i for i in servings.lower().split() if (i.isnumeric() is False) and (i in accepted_units)]
-
-                if num == []:
-                    servings_num = None
-                else:
-                    servings_num = num[0]
-
-                if unit == []:
-                    servings_unit = None
-                else:
-                    servings_unit = " ".join(unit)
+                url = line['url']
+                difficulty = "".join(line['difficulty'])
+                recipe_name = line['recipe_name']
 
 
-            ########################################################################
-            # INGREDIENTS: Populate value as an array; split into 2 additional columns
-            # of dict ingredient: qty (converted to grams) & text ingredients without
-            # amounts
+                ########################################################################
+                # CATEGORY TAGS: Transfer scraped category arrays to a set to return
+                # for further processing in LOAD_TAGS function.
 
-            # TEXT INGREDIENTS (written as in original text)
-            text_ingredients = line['ingredients']
+                urls_plus_categories[url] = set()
 
-            # INGREDIENTS NAMES (cleaned of measures, numeric amounts, commentary)
-            urls_plus_ingredients[url] = set()
-            ingredient_amounts = {}
-            ingredient_units = {}
-
-            if len(line['ingredients']) > 0:
-
-                for item in line['ingredients']:
-                    item = re.sub(r" ?\([^)]+\)", "", item)
-                    item = re.sub(r"\b-\b", " ", item)
-                    item = item.lower().split(" ")
-                    amt = [i for i in item if i.isnumeric() or i in fraction_conversions]
-
-                    if len(amt) > 0:
-                        if amt[0] in fraction_conversions:
-                            amt = [fraction_conversions[amt[0]]]
-                        if len(amt) > 1:
-                            if amt[1] in fraction_conversions:
-                                amt = [float(amt[0]) + fraction_conversions[amt[1]]]
-                            else:
-                                amt = amt[:1]
-                    else:
-                        amt = None
-
-                    unit = [i for i in item if (i in accepted_measures)]
-
-                    if len(unit) > 0:
-                        unit = accepted_measures[unit[0]]
-                    else:
-                        unit = None
-
-                    item = [i for i in item if ((i.isnumeric() is False) and (len(i) > 0) and (i not in measure_names and i not in descriptors and i not in fractions))]
-                    item = " ".join(item).rstrip().encode('utf-8')
-                    item = item.split(',')
-                    item = item[0]
+                for item in line['category_tags']:
                     if len(item) > 0:
-                        qty_data.add(item)
-                        urls_plus_ingredients[url].add(item)
+                        raw_tags.add(item)
+                        urls_plus_categories[url].add(item)
 
-            # INGREDIENTS QTY (uses cleaned ingredient names as keys; converts
-            # amounts to grams for consistency; also tracks corresponding units)
-                        if item not in ingredient_amounts:
-                            if amt is not None and len(amt) > 0:
-                                if unit is not None:
-                                    amt = amt[0]
-                                    if type(amt) != float and not amt.isdigit():
-                                        amt = numeric(amt)
-                                    ingredient_amounts[item] = round((float(amt) * gram_conversions[unit]), 2)
+                ########################################################################
+                # DIFFICULTY LEVELS: Transfer scraped difficulty strings to a set to return
+                # for further processing in LOAD_DIFFICULTY function.
+
+                if difficulty != 'N/A':
+                    urls_plus_difficulty[url] = difficulty
+                    difficulty_types.add(difficulty)
+
+
+                ########################################################################
+                # SERVINGS: Split servings strings into 2 columns: servings_num (integer)
+                # and servings_unit (text of serving unit/quantity)
+
+                servings = line['servings']
+                text_servings = line['servings']
+
+                if servings == 'N/A':
+                    servings_unit = None
+                    servings_num = None
+                    text_servings = None
+
+                else:
+                    servings = re.sub(r" ?\([^)]+\)", "", servings)
+                    num = [i for i in servings.split() if i.isnumeric()]
+                    unit = [i for i in servings.lower().split() if (i.isnumeric() is False) and (i in accepted_units)]
+
+                    if num == []:
+                        servings_num = None
+                    else:
+                        servings_num = num[0]
+
+                    if unit == []:
+                        servings_unit = None
+                    else:
+                        servings_unit = " ".join(unit)
+
+
+                ########################################################################
+                # INGREDIENTS: Populate value as an array; split into 2 additional columns
+                # of dict ingredient: qty (converted to grams) & text ingredients without
+                # amounts
+
+                # TEXT INGREDIENTS (written as in original text)
+                text_ingredients = line['ingredients']
+
+                # INGREDIENTS NAMES (cleaned of measures, numeric amounts, commentary)
+                urls_plus_ingredients[url] = set()
+                ingredient_amounts = {}
+                ingredient_units = {}
+
+                if len(line['ingredients']) > 0:
+
+                    for item in line['ingredients']:
+                        item = re.sub(r" ?\([^)]+\)", "", item)
+                        item = re.sub(r"\b-\b", " ", item)
+                        item = item.lower().split(" ")
+                        amt = [i for i in item if i.isnumeric() or i in fraction_conversions]
+
+                        if len(amt) > 0:
+                            if amt[0] in fraction_conversions:
+                                amt = [fraction_conversions[amt[0]]]
+                            if len(amt) > 1:
+                                if amt[1] in fraction_conversions:
+                                    amt = [float(amt[0]) + fraction_conversions[amt[1]]]
                                 else:
-                                    amt = amt[0]
-                                    if type(amt) != float and not amt.isdigit():
-                                        amt = numeric(amt)
-                                    ingredient_amounts[item] = amt
-                            else:
-                                ingredient_amounts[item] = None
+                                    amt = amt[:1]
+                        else:
+                            amt = None
 
-                        # Add ingredient units to ingredient_units dictionary
-                        if item not in ingredient_units:
-                            if unit is not None:
-                                ingredient_units[item] = unit
+                        unit = [i for i in item if (i in accepted_measures)]
 
+                        if len(unit) > 0:
+                            unit = accepted_measures[unit[0]]
+                        else:
+                            unit = None
 
-            ########################################################################
-            # SPECIAL EQUIPMENT: Populate with null if null; clean formatting where
-            # not null
-            if len(line['special_equipment']) == 0:
-                special_equipment = None
-            else:
-                for i in range(len(line['special_equipment'])):
-                    s = line['special_equipment'][i].lstrip()
-                    prefix = s[:19]
-                    if prefix == "Special equipment: ":
-                        line['special_equipment'][i] = s[19:].rstrip()
-                special_equipment = line['special_equipment']
+                        item = [i for i in item if ((i.isnumeric() is False) and (len(i) > 0) and (i not in measure_names and i not in descriptors and i not in fractions))]
+                        item = " ".join(item).rstrip().encode('utf-8')
+                        item = item.split(',')
+                        item = item[0]
+                        if len(item) > 0:
+                            qty_data.add(item)
+                            urls_plus_ingredients[url].add(item)
 
+                # INGREDIENTS QTY (uses cleaned ingredient names as keys; converts
+                # amounts to grams for consistency; also tracks corresponding units)
+                            if item not in ingredient_amounts:
+                                if amt is not None and len(amt) > 0:
+                                    if unit is not None:
+                                        amt = amt[0]
+                                        if type(amt) != float and not amt.isdigit():
+                                            print amt
+                                            if len(amt) > 1:
+                                                amt = numeric(amt[0]) + numeric(amt[1])
+                                            else:
+                                                amt = numeric(amt)
+                                            print amt
+                                        ingredient_amounts[item] = round((float(amt) * gram_conversions[unit]), 2)
+                                    else:
+                                        amt = amt[0]
+                                        if type(amt) != float and not amt.isdigit():
+                                            print amt
+                                            if len(amt) > 1:
+                                                amt = numeric(amt[0]) + numeric(amt[1])
+                                            else:
+                                                amt = numeric(amt)
+                                            print amt
+                                        ingredient_amounts[item] = amt
+                                else:
+                                    ingredient_amounts[item] = None
 
-            ########################################################################
-            # PREP INSTRUCTIONS: Clean formatting & add cleaned list of <p> contents
-
-            stripped_prep = []
-            for p in line['preparation']:
-                if len(p.lstrip().rstrip()) > 0:
-                    stripped_prep.append(p.lstrip().rstrip())
-
-            preparation = stripped_prep
-
-
-            ########################################################################
-            # ALL RECIPE TIMES: Populate with null if null; if not null, typecast
-            # into sql interval type
-
-            times = {
-                'hr': 'hours',
-                'min': 'minutes'
-            }
-
-            # TOTAL TIME
-            if line['total_time'] == 'N/A':
-                total_time = None
-            else:
-                total_time = ""
-                time = line['total_time'].split()
-                for t in time:
-                    if t.isnumeric():
-                        total_time = total_time + t
-                    else:
-                        total_time = total_time + " {} ".format(times[t])
-
-            # COOK TIME
-            if line['cook_time'] == 'N/A':
-                cook_time = None
-            else:
-                cook_time = ""
-                time = line['cook_time'].split()
-                for t in time:
-                    if t.isnumeric():
-                        cook_time = cook_time + t
-                    else:
-                        cook_time = cook_time + " {} ".format(times[t])
-
-            # PREP TIME
-            if line['prep_time'] == 'N/A':
-                prep_time = None
-            else:
-                prep_time = ""
-                time = line['prep_time'].split()
-                for t in time:
-                    if t.isnumeric():
-                        prep_time = prep_time + t
-                    else:
-                        prep_time = prep_time + " {} ".format(times[t])
-
-            # ACTIVE TIME
-            if line['active_time'] == 'N/A':
-                active_time = None
-            else:
-                active_time = ""
-                time = line['active_time'].split()
-                for t in time:
-                    if t.isnumeric():
-                        active_time = active_time + t
-                    else:
-                        active_time = active_time + " {} ".format(times[t])
-
-            # INACTIVE TIME
-            if line['inactive_time'] == 'N/A':
-                inactive_time = None
-            else:
-                inactive_time = ""
-                time = line['inactive_time'].split()
-                for t in time:
-                    if t.isnumeric():
-                        inactive_time = inactive_time + t
-                    else:
-                        inactive_time = inactive_time + " {} ".format(times[t])
+                            # Add ingredient units to ingredient_units dictionary
+                            if item not in ingredient_units:
+                                if unit is not None:
+                                    ingredient_units[item] = unit
 
 
-            ########################################################################
-            # PHOTO URL: Check if photo URL exists or has default "N/A" value
-            # assigned from scrapy. If N/A, rebinds variable to python/jinja
-            # parsable "None"
-
-            photo_url = line['photo_url']
-
-            if photo_url == 'http:N/A':
-                photo_url = None
-
-
-            ########################################################################
-            # RECIPE AUTHOR: Check if Recipe Author exists or has default "N/A"
-            # value assigned from scrapy. If N/A, rebinds variable to
-            # python/jinja parsable "None"
-
-            recipe_author = line['recipe_author']
-
-            if recipe_author == 'N/A':
-                recipe_author = None
+                ########################################################################
+                # SPECIAL EQUIPMENT: Populate with null if null; clean formatting where
+                # not null
+                if len(line['special_equipment']) == 0:
+                    special_equipment = None
+                else:
+                    for i in range(len(line['special_equipment'])):
+                        s = line['special_equipment'][i].lstrip()
+                        prefix = s[:19]
+                        if prefix == "Special equipment: ":
+                            line['special_equipment'][i] = s[19:].rstrip()
+                    special_equipment = line['special_equipment']
 
 
-            ########################################################################
-            # CREATE OBJECT: Declare object, declare all column values, add object
-            # to database, rise & repeat.
+                ########################################################################
+                # PREP INSTRUCTIONS: Clean formatting & add cleaned list of <p> contents
 
-            recipe = Recipe(recipe_name=recipe_name,
-                            recipe_author=recipe_author,
-                            servings_num=servings_num,
-                            servings_unit=servings_unit,
-                            text_servings=text_servings,
-                            special_equipment=special_equipment,
-                            text_ingredients=text_ingredients,
-                            ingredient_amounts=ingredient_amounts,
-                            ingredient_units=ingredient_units,
-                            preparation=preparation,
-                            total_time=total_time,
-                            prep_time=prep_time,
-                            cook_time=cook_time,
-                            active_time=active_time,
-                            inactive_time=inactive_time,
-                            photo_url=photo_url,
-                            recipe_url=url)
+                stripped_prep = []
+                for p in line['preparation']:
+                    if len(p.lstrip().rstrip()) > 0:
+                        stripped_prep.append(p.lstrip().rstrip())
 
-            db.session.add(recipe)
+                preparation = stripped_prep
 
-    ############################################################################
-    # COMMIT: Commit all changes (objects added) to database.
 
-    db.session.commit()
+                ########################################################################
+                # ALL RECIPE TIMES: Populate with null if null; if not null, typecast
+                # into sql interval type
+
+                times = {
+                    'hr': 'hours',
+                    'min': 'minutes'
+                }
+
+                # TOTAL TIME
+                if line['total_time'] == 'N/A':
+                    total_time = None
+                else:
+                    total_time = ""
+                    time = line['total_time'].split()
+                    for t in time:
+                        if t.isnumeric():
+                            total_time = total_time + t
+                        else:
+                            total_time = total_time + " {} ".format(times[t])
+
+                # COOK TIME
+                if line['cook_time'] == 'N/A':
+                    cook_time = None
+                else:
+                    cook_time = ""
+                    time = line['cook_time'].split()
+                    for t in time:
+                        if t.isnumeric():
+                            cook_time = cook_time + t
+                        else:
+                            cook_time = cook_time + " {} ".format(times[t])
+
+                # PREP TIME
+                if line['prep_time'] == 'N/A':
+                    prep_time = None
+                else:
+                    prep_time = ""
+                    time = line['prep_time'].split()
+                    for t in time:
+                        if t.isnumeric():
+                            prep_time = prep_time + t
+                        else:
+                            prep_time = prep_time + " {} ".format(times[t])
+
+                # ACTIVE TIME
+                if line['active_time'] == 'N/A':
+                    active_time = None
+                else:
+                    active_time = ""
+                    time = line['active_time'].split()
+                    for t in time:
+                        if t.isnumeric():
+                            active_time = active_time + t
+                        else:
+                            active_time = active_time + " {} ".format(times[t])
+
+                # INACTIVE TIME
+                if line['inactive_time'] == 'N/A':
+                    inactive_time = None
+                else:
+                    inactive_time = ""
+                    time = line['inactive_time'].split()
+                    for t in time:
+                        if t.isnumeric():
+                            inactive_time = inactive_time + t
+                        else:
+                            inactive_time = inactive_time + " {} ".format(times[t])
+
+
+                ########################################################################
+                # PHOTO URL: Check if photo URL exists or has default "N/A" value
+                # assigned from scrapy. If N/A, rebinds variable to python/jinja
+                # parsable "None"
+
+                photo_url = line['photo_url']
+
+                if photo_url == 'http:N/A':
+                    photo_url = None
+
+
+                ########################################################################
+                # RECIPE AUTHOR: Check if Recipe Author exists or has default "N/A"
+                # value assigned from scrapy. If N/A, rebinds variable to
+                # python/jinja parsable "None"
+
+                recipe_author = line['recipe_author']
+
+                if recipe_author == 'N/A':
+                    recipe_author = None
+
+
+                ########################################################################
+                # CREATE OBJECT: Declare object, declare all column values, add object
+                # to database, rise & repeat.
+
+                recipe = Recipe(recipe_name=recipe_name,
+                                recipe_author=recipe_author,
+                                servings_num=servings_num,
+                                servings_unit=servings_unit,
+                                text_servings=text_servings,
+                                special_equipment=special_equipment,
+                                text_ingredients=text_ingredients,
+                                ingredient_amounts=ingredient_amounts,
+                                ingredient_units=ingredient_units,
+                                preparation=preparation,
+                                total_time=total_time,
+                                prep_time=prep_time,
+                                cook_time=cook_time,
+                                active_time=active_time,
+                                inactive_time=inactive_time,
+                                photo_url=photo_url,
+                                recipe_url=url)
+
+                db.session.add(recipe)
+
+        ############################################################################
+        # COMMIT: Commit all changes (objects added) to database.
+
+        db.session.commit()
 
     return [urls_plus_ingredients, qty_data, urls_plus_categories, raw_tags,
             urls_plus_difficulty, difficulty_types]
