@@ -1,0 +1,13 @@
+{% block content%}
+<h4>ActivEats Shopping List</h4>
+<h5>Your chosen recipe is:</h5>
+<h4>{{ recipe_name }}</h4>
+<br>
+<ul>
+{% for line in list_content %}
+<li>{{ line }}</li>
+{% endfor %}
+</ul>
+
+Happy Shopping!
+{% endblock %}

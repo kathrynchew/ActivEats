@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<br><br>
+<form id="test-form">
+    <input type="text" id="inputText">
+    <a href="#" class="btn btn-primary shopping-button">Clicky</a>
+</form>
+<br>
+<form id="boopBoop">
+<!--     <input name="email" class="form-control" id="inputEmail" placeholder="Email This List">
+    <a href="#" class="btn btn-primary other-button">Clicky</a> -->
+</form>
+
+<script type="text/javascript">
+function testSomething(evt) {
+    // let testText = document.querySelector('#inputText').value;
+    // console.log(testText);
+    document.querySelector('#boopBoop').innerHTML = '<input name="email" class="form-control" id="inputEmail" placeholder="Email This List">
+    <a href="#" class="btn btn-primary other-button">Clicky</a>'
+    document.querySelector('.other-button').addEventListener("click", testAnotherthing);
+
+}
+
+function testAnotherthing (evt) {
+    let otherText = document.querySelector('#inputEmail').value;
+    console.log(otherText);
+}
+
+document.querySelector('.shopping-button').addEventListener("click", testSomething);
+// document.querySelector('.other-button').addEventListener("click", testAnotherthing);
+</script>
+
+{% endblock %}

@@ -12,6 +12,7 @@ from flask_mail import Mail, Message
 from isoweek import Week
 import os
 import ingredients
+import meal_plan
 import random
 import datetime
 import time
@@ -52,14 +53,15 @@ def display_featured_recipe():
 @app.route('/test')
 def display_recipe_formatting():
     """ Figure out how to display a recipe """
-    recipe_id = random.randint(1, 990)
+    # recipe_id = random.randint(1, 990)
 
-    recipe_text = Recipe.query.filter_by(recipe_id=recipe_id).first()
+    # recipe_text = Recipe.query.filter_by(recipe_id=recipe_id).first()
 
-    print recipe_text.recipe_categories
+    # print recipe_text.recipe_categories
 
-    return render_template("display_recipe.html",
-                           recipe_text=recipe_text)
+    # return render_template("display_recipe.html",
+    #                        recipe_text=recipe_text)
+    return render_template("test.html")
 
 
 @app.route('/login')
@@ -204,47 +206,68 @@ def display_current_meal_plan():
     if len(Collection.query.filter(Collection.set_number == set_number,
                                    Collection.user_id == user_id).all()) == 0:
 
-        breakfast_recipes = []
-        lunch_recipes = []
-        dinner_recipes = []
         user_prefs = []
-
-        breakfast = Category.query.filter(Category.category_name.in_(breakfast_list)).all()
-        lunch = Category.query.filter(Category.category_name.in_(lunch_list)).all()
-        dinner = Category.query.filter(Category.category_name.in_(dinner_list)).all()
-
         prefs = db.session.query(UserPreference.category_id).filter(UserPreference.user_id == user_id).all()
         for pref in prefs:
             user_prefs.append(pref[0])
 
-        for category in breakfast:
-            for recipe in category.recipe_categories:
-                for other_cat in recipe.recipes.recipe_categories:
-                    if other_cat.category_id in user_prefs:
-                        breakfast_recipes.append(recipe.recipes)
+        print user_prefs
 
-        for category in lunch:
-            for recipe in category.recipe_categories:
-                for other_cat in recipe.recipes.recipe_categories:
-                    if other_cat.category_id in user_prefs:
-                        lunch_recipes.append(recipe.recipes)
+        breakfast = Category.query.filter(Category.category_name.in_(breakfast_list)).all()
+        lunch = Category.query.filter(Category.category_id.in_(user_prefs)).all()
+        dinner = Category.query.filter(Category.category_id.in_(user_prefs)).all()
 
-        for category in dinner:
-            for recipe in category.recipe_categories:
-                for other_cat in recipe.recipes.recipe_categories:
-                    if other_cat.category_id in user_prefs:
-                        dinner_recipes.append(recipe.recipes)
+        weekly_breakfasts = meal_plan.make_meal_set(breakfast, user_prefs)
+        weekly_lunches = meal_plan.make_meal_set(lunch, user_prefs)
+        weekly_dinners = meal_plan.make_meal_set(dinner, user_prefs)
 
-        if len(breakfast_recipes) < 5:
-            multiply_breakfasts = []
-            while len(multiply_breakfasts) < 5:
-                for item in breakfast_recipes:
-                    multiply_breakfasts.append(item)
-            weekly_breakfasts = random.sample(multiply_breakfasts, 5)
-        else:
-            weekly_breakfasts = random.sample(breakfast_recipes, 5)
-        weekly_lunches = random.sample(lunch_recipes, 5)
-        weekly_dinners = random.sample(dinner_recipes, 5)
+        # for category in breakfast:
+        #     for recipe in category.recipe_categories:
+        #         for other_cat in recipe.recipes.recipe_categories:
+        #             if other_cat.category_id in user_prefs:
+        #                 breakfast_recipes.append(recipe.recipes)
+
+        # for category in lunch:
+        #     for recipe in category.recipe_categories:
+        #         for other_cat in recipe.recipes.recipe_categories:
+        #             if other_cat.category_id in user_prefs:
+        #                 lunch_recipes.append(recipe.recipes)
+
+        # for category in dinner:
+        #     for recipe in category.recipe_categories:
+        #         for other_cat in recipe.recipes.recipe_categories:
+        #             if other_cat.category_id in user_prefs:
+        #                 dinner_recipes.append(recipe.recipes)
+
+        # if len(breakfast_recipes) < 5:
+        #     multiply_breakfasts = []
+        #     while len(multiply_breakfasts) < 5:
+        #         for item in breakfast_recipes:
+        #             multiply_breakfasts.append(item)
+        #     weekly_breakfasts = random.sample(multiply_breakfasts, 5)
+        # else:
+        #     weekly_breakfasts = random.sample(breakfast_recipes, 5)
+
+        # if len(lunch_recipes) < 5:
+        #     multiply_lunches = []
+        #     while len(multiply_lunches) < 5:
+        #         for item in lunch_recipes:
+        #             multiply_lunches.append(item)
+        #     weekly_lunches = random.sample(multiply_lunches, 5)
+        # else:
+        #     weekly_lunches = random.sample(lunch_recipes, 5)
+
+        # if len(dinner_recipes) < 5:
+        #     multiply_dinners = []
+        #     while len(multiply_dinners) < 5:
+        #         for item in dinner_recipes:
+        #             multiply_dinners.append(item)
+        #     weekly_dinners = random.sample(multiply_dinners, 5)
+        # else:
+        #     weekly_dinners = random.sample(dinner_recipes, 5)
+
+        # weekly_lunches = random.sample(lunch_recipes, 5)
+        # weekly_dinners = random.sample(dinner_recipes, 5)
 
         # Create Collection object from this week's selected breakfast recipes
         day_num = 0
@@ -372,16 +395,27 @@ def display_search_results():
 
 @app.route("/send", methods=["POST"])
 def send_mail():
-    user_email = User.query.filter_by(user_id=session['user_id']).first().email
-
     shopping_contents = dict(request.form)
+    print shopping_contents
+
+    if session['user_id']:
+        print "I'm Logged In!!!"
+        user_email = User.query.filter_by(user_id=session['user_id']).first().email
+    else:
+        print "I ain't logged in!!!!"
+        user_email = shopping_contents['user_email'][0]
+        print user_email
 
     msg = Message('Hello',
                   sender=os.environ['MAIL_USERNAME'],
                   recipients=[user_email])
-    msg.body = "This is a test email: {}".format(shopping_contents['recipe_name'])
+    # msg.body = "This is a test email: {}".format(shopping_contents['recipe_name'])
+    msg.html = render_template('shopping_list_email.html',
+                               recipe_name=shopping_contents['recipe_name'][0],
+                               list_content=shopping_contents['list_content'][0].rstrip().split('\n'))
     mail.send(msg)
     return "Sent"
+
 
 ################################################################################
 ########################### USER PERSONALIZED ROUTES ###########################

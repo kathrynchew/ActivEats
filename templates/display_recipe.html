@@ -44,7 +44,7 @@ by {{ recipe_text.recipe_author }}
       <div class="card-body">
         <h5 class="card-title shopping-title">Generate Shopping List</h5>
         <p class="card-text shopping-list">Click the button to generate a shopping list for this recipe</p>
-        <a href="#" class="btn btn-primary shopping-button">Generate</a><div id="email-results"></div>
+        <form name="notLoggedIn" id="notLoggedIn" style="float: left"></form><a href="#" class="btn btn-primary shopping-button" id="generate-button">Generate</a><div id="email-results"></div>
       </div>
     </div>
   </div>
@@ -71,31 +71,64 @@ let $jq = jQuery.noConflict();
 
 function emailSentConfirm(results) {
     let emailStatus = results;
-    document.querySelector('#email-results').innerText = "&nbsp;&nbsp; Email Successful";
+    document.querySelector('#email-results').innerText = "Email Successful";
 }
 
 function emailShoppingList(evt) {
+    console.log('WE LOGGED IN BRO');
     let listContent = document.querySelector('.shopping-list').innerText;
     let recipeName = document.querySelector('#recipe-name').innerText;
-    console.log(listContent);
+
+$jq.post("/send",
+         {'list_content': listContent,
+          'recipe_name': recipeName},
+         emailSentConfirm);
+
+}
+
+function emailLoggedOut(evt) {
+    let userEmail = document.querySelector('#inputEmail').value;
+    
+    console.log('WE NOT LOGGED IN BRO');
+    let listContent = document.querySelector('.shopping-list').innerText;
+    let recipeName = document.querySelector('#recipe-name').innerText;
+
+    if (userEmail) {
     $jq.post("/send",
              {'list_content': listContent,
-              'recipe_name': recipeName},
-             emailSentConfirm);
+              'recipe_name': recipeName,
+              'user_email': userEmail},
+              emailSentConfirm);
+    }   else {
+            $jq.post("/send",
+                     {'list_content': listContent,
+                      'recipe_name': recipeName},
+                     emailSentConfirm);
+        }
+
 }
 
 function generateShoppingList(evt) {
-    // let ingredients = "{{ recipe_text.recipe_ingredients }}";
-    // console.log(ingredients);
+    console.log("HI GOMPO");
+    document.querySelector('.shopping-button').removeEventListener('click', generateShoppingList);
     document.querySelector('.shopping-title').innerText = "Shopping List";
     document.querySelector('.shopping-list').innerHTML = "<ul>{% for item in shopping_list %}<li>{{ item[1] }} {{ item[2] }} {{ item[0] }}</li>{% endfor %}</ul>";
     document.querySelector('.shopping-button').innerText = "Email This List";
-    document.querySelector('.shopping-button').setAttribute('id', 'email-button');
 
-    document.querySelector('#email-button').addEventListener('click', emailShoppingList);
+    if (typeof {{ session['user_id'] }} === 'undefined') {
+        document.querySelector('.shopping-button').setAttribute('id', 'email-button');
+        document.querySelector('#notLoggedIn').innerHTML = '<input name="email" class="form-control" id="inputEmail" placeholder="Email This List">';
+        document.querySelector('.shopping-button').innerText = "Send";
+        document.querySelector('.shopping-button').classList.add('float-right');
+        document.querySelector('.shopping-button').addEventListener('click', emailLoggedOut);
+        // document.querySelector('.shopping-button').addEventListener('click', function(){console.log(document.querySelector('#inputEmail').value)});
+    }   else {
+            document.querySelector('.shopping-button').addEventListener('click', emailShoppingList);
+        }
+
+    
 }
 
 document.querySelector('.shopping-button').addEventListener('click', generateShoppingList);
-console.log("WHY OH WHY");
 </script>
 {% endblock %}
