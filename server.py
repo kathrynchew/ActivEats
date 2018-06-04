@@ -213,61 +213,18 @@ def display_current_meal_plan():
 
         print user_prefs
 
-        breakfast = Category.query.filter(Category.category_name.in_(breakfast_list)).all()
-        lunch = Category.query.filter(Category.category_id.in_(user_prefs)).all()
-        dinner = Category.query.filter(Category.category_id.in_(user_prefs)).all()
+        if len(user_prefs) > 0:
+            breakfast = Category.query.filter(Category.category_name.in_(breakfast_list)).all()
+            lunch = Category.query.filter(Category.category_id.in_(user_prefs)).all()
+            dinner = Category.query.filter(Category.category_id.in_(user_prefs)).all()
+        else:
+            breakfast = Category.query.filter(Category.category_name.in_(breakfast_list)).all()
+            lunch = Category.query.filter(Category.category_name.in_(lunch_list)).all()
+            dinner = Category.query.filter(Category.category_name.in_(dinner_list)).all()
 
         weekly_breakfasts = meal_plan.make_meal_set(breakfast, user_prefs)
         weekly_lunches = meal_plan.make_meal_set(lunch, user_prefs)
         weekly_dinners = meal_plan.make_meal_set(dinner, user_prefs)
-
-        # for category in breakfast:
-        #     for recipe in category.recipe_categories:
-        #         for other_cat in recipe.recipes.recipe_categories:
-        #             if other_cat.category_id in user_prefs:
-        #                 breakfast_recipes.append(recipe.recipes)
-
-        # for category in lunch:
-        #     for recipe in category.recipe_categories:
-        #         for other_cat in recipe.recipes.recipe_categories:
-        #             if other_cat.category_id in user_prefs:
-        #                 lunch_recipes.append(recipe.recipes)
-
-        # for category in dinner:
-        #     for recipe in category.recipe_categories:
-        #         for other_cat in recipe.recipes.recipe_categories:
-        #             if other_cat.category_id in user_prefs:
-        #                 dinner_recipes.append(recipe.recipes)
-
-        # if len(breakfast_recipes) < 5:
-        #     multiply_breakfasts = []
-        #     while len(multiply_breakfasts) < 5:
-        #         for item in breakfast_recipes:
-        #             multiply_breakfasts.append(item)
-        #     weekly_breakfasts = random.sample(multiply_breakfasts, 5)
-        # else:
-        #     weekly_breakfasts = random.sample(breakfast_recipes, 5)
-
-        # if len(lunch_recipes) < 5:
-        #     multiply_lunches = []
-        #     while len(multiply_lunches) < 5:
-        #         for item in lunch_recipes:
-        #             multiply_lunches.append(item)
-        #     weekly_lunches = random.sample(multiply_lunches, 5)
-        # else:
-        #     weekly_lunches = random.sample(lunch_recipes, 5)
-
-        # if len(dinner_recipes) < 5:
-        #     multiply_dinners = []
-        #     while len(multiply_dinners) < 5:
-        #         for item in dinner_recipes:
-        #             multiply_dinners.append(item)
-        #     weekly_dinners = random.sample(multiply_dinners, 5)
-        # else:
-        #     weekly_dinners = random.sample(dinner_recipes, 5)
-
-        # weekly_lunches = random.sample(lunch_recipes, 5)
-        # weekly_dinners = random.sample(dinner_recipes, 5)
 
         # Create Collection object from this week's selected breakfast recipes
         day_num = 0
