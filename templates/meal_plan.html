@@ -3,7 +3,7 @@
 {% block content %}
 <h1>{{ session['username'] }}'s Meal Plan</h1>
 <hr>
-<h2>Week of {{ start_day }}</h2>
+<h2 id="setName">Week of {{ start_day }}</h2>
 <table class="table table-striped table-dark table-borderless">
     <tr class="d-flex">
         <th scope="col" class="col-2"></th>
@@ -39,6 +39,7 @@
         <h5 class="card-title shopping-title">Generate & Email Shopping List</h5>
         <p class="card-text shopping-list">Click the button to generate a shopping list</p>
         <a href="#" class="btn btn-primary shopping-button">Generate</a>
+        <a href="#" class="btn btn-primary email-button" style="display: none">Email This List</a>
       </div>
     </div>
   </div>
@@ -47,10 +48,31 @@
 
 <!-- ###### JavaScript for Generating & Emailing Shopping List Here ###### -->
 <script type="text/javascript">
+let $jq = jQuery.noConflict();
+
+function emailSentConfirm(results) {
+    if (results==="Sent") {
+        console.log("I'm a little teapot!")
+    }
+}
+
+function emailShoppingList(evt) {
+    let listContent = document.querySelector('.shopping-list').innerText;
+    let setName = document.querySelector('#setName').innerText;
+
+    $jq.post("/send_all",
+         {'list_content': listContent,
+          'set_name': setName},
+         emailSentConfirm);
+}
+
 function generateShoppingList(evt) {
 
     document.querySelector('.shopping-title').innerText = "Shopping List"
     document.querySelector('.shopping-list').innerHTML = '<ul id="article">{% for ingredient in ingredients %}{% if ingredient[1] == 0 %}<li>{{ ingredient[0] }}</li>{% elif ingredient[2] is none %}<li>{{ ingredient[1] }} pieces {{ ingredient[0] }}</li>{% else %}<li>{{ ingredient[1] }} {{ ingredient[2] }}s {{ ingredient[0] }}</li>{% endif %}{% endfor %}</ul>'
+    document.querySelector('.shopping-button').setAttribute("style", "display: none");
+    document.querySelector('.email-button').removeAttribute("style", "display: none");
+    document.querySelector('.email-button').addEventListener("click", emailShoppingList);
 }
 
 document.querySelector('.shopping-button').addEventListener('click', generateShoppingList)

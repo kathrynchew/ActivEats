@@ -6,8 +6,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from model import (connect_to_db, db, Recipe, Ingredient, RecipeIngredient,
                    Category, RecipeCategory, Difficulty, RecipeDifficulty, User,
                    UserPreference, Collection)
-from data_cleaning_sets import (gram_conversions, breakfast_list, lunch_list,
-                                dinner_list)
+from data_cleaning_sets import (breakfast_list, lunch_list, dinner_list)
 from flask_mail import Mail, Message
 from isoweek import Week
 import os
@@ -233,7 +232,7 @@ def display_current_meal_plan():
             day_num += 1
 
             breakfast_recipe = Collection(user_id=session['user_id'],
-                                          assigned_date=datetime.date.today(),
+                                          assigned_date=start_day,
                                           set_number=set_number,
                                           set_day=day_num,
                                           meal_type="breakfast",
@@ -248,7 +247,7 @@ def display_current_meal_plan():
             day_num += 1
 
             lunch_recipe = Collection(user_id=session['user_id'],
-                                      assigned_date=datetime.date.today(),
+                                      assigned_date=start_day,
                                       set_number=set_number,
                                       set_day=day_num,
                                       meal_type="lunch",
@@ -263,7 +262,7 @@ def display_current_meal_plan():
             day_num += 1
 
             dinner_recipe = Collection(user_id=session['user_id'],
-                                       assigned_date=datetime.date.today(),
+                                       assigned_date=start_day,
                                        set_number=set_number,
                                        set_day=day_num,
                                        meal_type="dinner",
@@ -352,6 +351,11 @@ def display_search_results():
 
 @app.route("/send", methods=["POST"])
 def send_mail():
+    """ Sends email for single recipe shopping list.
+
+    Checks if user is logged in or not. If yes, obtains recipient email address
+    by querying user's emaill address using user_id from the session. If no,
+    takes in recipient email address from form on the recipe page. """
     shopping_contents = dict(request.form)
     print shopping_contents
 
@@ -369,6 +373,24 @@ def send_mail():
     # msg.body = "This is a test email: {}".format(shopping_contents['recipe_name'])
     msg.html = render_template('shopping_list_email.html',
                                recipe_name=shopping_contents['recipe_name'][0],
+                               list_content=shopping_contents['list_content'][0].rstrip().split('\n'))
+    mail.send(msg)
+    return "Sent"
+
+
+@app.route("/send_all", methods=["POST"])
+def send_meal_plan_mail():
+    """ Sends email for full weekly meal plan shopping list. """
+    shopping_contents = dict(request.form)
+    print shopping_contents
+
+    user_email = User.query.filter_by(user_id=session['user_id']).first().email
+
+    msg = Message('Hello',
+                  sender=os.environ['MAIL_USERNAME'],
+                  recipients=[user_email])
+    msg.html = render_template('shopping_list_email.html',
+                               recipe_name=shopping_contents['set_name'][0],
                                list_content=shopping_contents['list_content'][0].rstrip().split('\n'))
     mail.send(msg)
     return "Sent"
