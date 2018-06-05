@@ -21,8 +21,7 @@ def load_collections():
             # print line[0].lstrip().rstrip()
             # print line[5].lstrip().rstrip()
 
-            col_data = Collection(user_col_id=line[0].lstrip().rstrip(),
-                                  user_id=line[1].lstrip().rstrip(),
+            col_data = Collection(user_id=line[1].lstrip().rstrip(),
                                   assigned_date=line[2].lstrip().rstrip(),
                                   set_number=line[3].lstrip().rstrip(),
                                   set_day=line[4].lstrip().rstrip(),
