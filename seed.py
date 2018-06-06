@@ -5,6 +5,7 @@ from model import Recipe, Ingredient, RecipeIngredient, Category, RecipeCategory
 from server import app
 import json
 import re
+import seed_sample_users
 from unicodedata import numeric
 from sqlalchemy.dialects.postgresql import array, ARRAY, JSON
 from sqlalchemy.sql.functions import Cast
@@ -536,5 +537,8 @@ if __name__ == "__main__":
     load_recipe_ingredients(urls_plus_ingredients)
     load_recipe_categories(urls_plus_categories)
     load_recipe_difficulty(urls_plus_difficulty)
+
+    # Populate sample user
+    seed_sample_users.load_sample_user()
 
     # set_val_recipe_id()
