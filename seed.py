@@ -47,7 +47,6 @@ def load_recipes():
     difficulty_types = set()
 
     for data_file in data_files:
-        print "warwick"
         with open(data_file) as file:
             recipe_lines = json.load(file)
 
@@ -166,22 +165,18 @@ def load_recipes():
                                     if unit is not None:
                                         amt = amt[0]
                                         if type(amt) != float and not amt.isdigit():
-                                            print amt
                                             if len(amt) > 1:
                                                 amt = numeric(amt[0]) + numeric(amt[1])
                                             else:
                                                 amt = numeric(amt)
-                                            print amt
                                         ingredient_amounts[item] = round((float(amt) * gram_conversions[unit]), 2)
                                     else:
                                         amt = amt[0]
                                         if type(amt) != float and not amt.isdigit():
-                                            print amt
                                             if len(amt) > 1:
                                                 amt = numeric(amt[0]) + numeric(amt[1])
                                             else:
                                                 amt = numeric(amt)
-                                            print amt
                                         ingredient_amounts[item] = amt
                                 else:
                                     ingredient_amounts[item] = None

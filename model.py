@@ -153,6 +153,35 @@ class Difficulty(db.Model, Serializer):
 
         return "<Difficulty level: {}>".format(self.difficulty_level)
 
+
+################################################################################
+# FEATURED RECIPES TABLE
+
+class FeaturedRecipe(db.Model, Serializer):
+    """ Table to track recipes featured on the front page of ActivEats """
+
+    __tablename__ = "featured_recipes"
+
+    feature_id = db.Column(db.Integer, autoincrement=True, primary_key=True,
+                         nullable=False)
+    recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.recipe_id'),
+                        nullable=False)
+    assigned_date = db.Column(db.Date, nullable=False)
+    assigned_week = db.Column(db.Integer, nullable=False)
+    assigned_year = db.Column(db.Integer, nullable=False)
+
+
+    recipe = db.relationship("Recipe", backref=db.backref("featured_recipes",
+                                                          order_by=feature_id))
+
+
+    def __repr__(self):
+        """ Representative model for featured recipes """
+
+        return "<Feature id={}, date={}>".format(self.feature_id,
+                                                 self.assigned_date)
+
+
 ################################################################################
 ############################## ASSOCIATION TABLES ##############################
 ################################################################################
@@ -330,6 +359,7 @@ class Collection(db.Model, Serializer):
     meal_type = db.Column(db.Text, nullable=False)
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.recipe_id'),
                           nullable=False)
+
 
     recipe = db.relationship("Recipe",
                              backref=db.backref("user_collections",

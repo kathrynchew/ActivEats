@@ -5,7 +5,7 @@ from flask import Flask, render_template, redirect, request, flash, session, jso
 from flask_debugtoolbar import DebugToolbarExtension
 from model import (connect_to_db, db, Recipe, Ingredient, RecipeIngredient,
                    Category, RecipeCategory, Difficulty, RecipeDifficulty, User,
-                   UserPreference, Collection)
+                   UserPreference, Collection, FeaturedRecipe)
 from data_cleaning_sets import (breakfast_list, lunch_list, dinner_list)
 from flask_mail import Mail, Message
 from isoweek import Week
@@ -37,16 +37,36 @@ mail = Mail(app)
 @app.route('/')
 def display_featured_recipe():
     """ Home page """
-    recipe_id = random.randint(1, 990)
+    this_year = datetime.date.today().strftime('%Y')
+    this_week = datetime.date.today().strftime('%W')
 
-    featured_recipe = Recipe.query.filter_by(recipe_id=recipe_id).first()
+    current_feature = FeaturedRecipe.query.filter(FeaturedRecipe.assigned_week == this_week,
+                                                  FeaturedRecipe.assigned_year == this_year).first()
 
-    while not featured_recipe.photo_url:
+    print current_feature
+
+    if current_feature:
+        return render_template("home.html",
+                               recipe=current_feature.recipe)
+    else:
         recipe_id = random.randint(1, 990)
+
         featured_recipe = Recipe.query.filter_by(recipe_id=recipe_id).first()
 
-    return render_template("home.html",
-                           recipe=featured_recipe)
+        while not featured_recipe.photo_url:
+            recipe_id = random.randint(1, 990)
+            featured_recipe = Recipe.query.filter_by(recipe_id=recipe_id).first()
+
+        new_feature = FeaturedRecipe(recipe_id=recipe_id,
+                                     assigned_date=datetime.date.today(),
+                                     assigned_week=int(datetime.date.today().strftime('%W')),
+                                     assigned_year=int(datetime.date.today().strftime('%Y')))
+
+        db.session.add(new_feature)
+        db.session.commit()
+
+        return render_template("home.html",
+                               recipe=featured_recipe)
 
 
 @app.route('/test')
@@ -334,10 +354,6 @@ def display_search_results():
 
     search_results_names = Recipe.query.filter(Recipe.recipe_name.like("%{}%".format(cleaned_term))).all()
     search_results_categories = Category.query.filter(Category.category_name.like("%{}%".format(cleaned_term))).all()
-
-    print search_results_names
-    print search_results_categories
-    print "yo bro"
 
     return render_template("search_results.html",
                            recipes=search_results_names,

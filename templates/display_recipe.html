@@ -109,7 +109,6 @@ function emailLoggedOut(evt) {
 }
 
 function generateShoppingList(evt) {
-    console.log("HI GOMPO");
     document.querySelector('.shopping-button').removeEventListener('click', generateShoppingList);
     document.querySelector('.shopping-title').innerText = "Shopping List";
     document.querySelector('.shopping-list').innerHTML = "<ul>{% for item in shopping_list %}<li>{{ item[1] }} {{ item[2] }} {{ item[0] }}</li>{% endfor %}</ul>";
@@ -121,12 +120,10 @@ function generateShoppingList(evt) {
         document.querySelector('.shopping-button').innerText = "Send";
         document.querySelector('.shopping-button').classList.add('float-right');
         document.querySelector('.shopping-button').addEventListener('click', emailLoggedOut);
-        // document.querySelector('.shopping-button').addEventListener('click', function(){console.log(document.querySelector('#inputEmail').value)});
-    }   else {
-            document.querySelector('.shopping-button').addEventListener('click', emailShoppingList);
-        }
-
-    
+    }   
+    else {
+        document.querySelector('.shopping-button').addEventListener('click', emailShoppingList);
+        }    
 }
 
 document.querySelector('.shopping-button').addEventListener('click', generateShoppingList);
