@@ -21,13 +21,13 @@ def load_usda():
                     if nutrient['nutrient_id'] == "208":
                         cals_per_serving = nutrient['value']
                         cals_per_100g = nutrient['gm']
-                    elif: nutrient['nutrient_id'] == "269":
+                    elif nutrient['nutrient_id'] == "269":
                         sugar_per_serving = nutrient['value']
                         sugar_per_100g = nutrient['gm']
-                    elif: nutrient['nutrient_id'] == "204":
+                    elif nutrient['nutrient_id'] == "204":
                         fat_per_serving = nutrient['value']
                         fat_per_100g = nutrient['gm']
-                    elif: nutrient['nutrient_id'] == "205":
+                    elif nutrient['nutrient_id'] == "205":
                         carbs_per_serving = nutrient['value']
                         carbs_per_100g = nutrient['gm']
 
