@@ -10,6 +10,7 @@ from data_cleaning_sets import (breakfast_list, lunch_list, dinner_list)
 from flask_mail import Mail, Message
 from isoweek import Week
 from sample_calorie_data import calorie_data
+import bcrypt
 import os
 import ingredients
 import meal_plan
