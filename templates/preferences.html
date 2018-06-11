@@ -23,6 +23,13 @@
     <b>username:</b> {{ user_info.username }}<br>
     <b>email address:</b> {{ user_info.email }}
 <hr>
+<h3>Active Calories Burned</h3>
+<div class="col-sm-5">
+  <div class="card pt-3 pr-3 pl-3">
+    <canvas id="calorie-chart"></canvas>
+  </div>
+</div>
+<hr>
 <h3>Meal Plan History:</h3>
 
 
@@ -97,7 +104,7 @@ let $jq = jQuery.noConflict();
 //     d[i];
 // }
 
-console.log({{ past_plans }});
+// console.log({{ past_plans }});
 
 function editPreferences(evt) {
 
@@ -126,6 +133,47 @@ function displayPreferences(results) {
 }
 
 document.querySelector("#editPrefs").addEventListener('click', editPreferences);
+
+
+///// CHART GOES HERE
+let ctx = document.getElementById("calorie-chart").getContext('2d');
+
+let week_1 = 1007 + 1615 + 340;
+let week_2 = 1150;
+let week_3 = 1607 + 552 + 384;
+let week_4 = 1037 + 395 + 565;
+
+let myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+    "labels": ["Untracked",
+               "Untracked",
+               "Week 21",
+               "Week 22",
+               "Week 23",
+               "Week 24"
+               ],
+    "datasets": [
+        {
+            "data": [0, 0, week_1, week_2, week_3, week_4],
+            "backgroundColor": ["#fcaa67", "#fcaa67", "#fcaa67", "#fcaa67", "#fcaa67", "#fcaa67"],
+            "hoverBackground Color": ["#b0413e", "#b0413e", "#b0413e", "#b0413e", "#b0413e", "#b0413e"]
+        }
+    ]
+},
+    options: {
+        legend: {
+          display: false
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
 
 </script>
 {% endblock %}

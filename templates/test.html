@@ -11,12 +11,19 @@
     <a href="#" class="btn btn-primary other-button">Clicky</a> -->
 </form>
 
+<!-- <div class="melon-chart">
+  <canvas id="donutChart"></canvas>
+  <div id="donutLegend" class="chart-legend">
+</div> -->
+<div style="width: 300px; height: 300px">
+<canvas id="myChart"></canvas>
+</div>
+
 <script type="text/javascript">
 function testSomething(evt) {
     // let testText = document.querySelector('#inputText').value;
     // console.log(testText);
-    document.querySelector('#boopBoop').innerHTML = '<input name="email" class="form-control" id="inputEmail" placeholder="Email This List">
-    <a href="#" class="btn btn-primary other-button">Clicky</a>'
+    document.querySelector('#boopBoop').innerHTML = '<input name="email" class="form-control" id="inputEmail" placeholder="Email This List"><a href="#" class="btn btn-primary other-button">Clicky</a>';
     document.querySelector('.other-button').addEventListener("click", testAnotherthing);
 
 }
@@ -28,6 +35,58 @@ function testAnotherthing (evt) {
 
 document.querySelector('.shopping-button').addEventListener("click", testSomething);
 // document.querySelector('.other-button').addEventListener("click", testAnotherthing);
+
+//////// CHART HERE
+
+// console.log('{{ datastuff }}');
+
+let ctx = document.getElementById("myChart").getContext('2d');
+
+// let week_1 = 1007 + 1615 + 340;
+let week_2 = 1150;
+let week_3 = 1607 + 552 + 384;
+let week_4 = 1037 + 395 + 565;
+
+let myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+    "labels": [{{ title_1 }},
+               "Week 22",
+               "Week 23",
+               "Week 24"
+               ],
+    "datasets": [
+        {
+            "data": [{{ week_1 }}, week_2, week_3, week_4],
+            "backgroundColor": ["#FF6384", "#FF6384", "#FF6384", "#FF6384"],
+            "hoverBackground Color": ["#36A2EB", "#36A2EB", "#36A2EB", "#36A2EB"]
+        }
+    ]
+},
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+
+// var options = { responsive: true };
+
+// var ctx_donut = $("#donutChart").get(0).getContext("2d");
+
+// $.get("/melon-types.json", function (data) {
+//     var myDonutChart = new Chart(ctx_donut, {
+//                                             type: 'doughnut',
+//                                             data: data,
+//                                             options: options
+//                                           });
+//     $('#donutLegend').html(myDonutChart.generateLegend());
+// });
 </script>
+
 
 {% endblock %}

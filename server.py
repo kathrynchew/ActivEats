@@ -9,9 +9,11 @@ from model import (connect_to_db, db, Recipe, Ingredient, RecipeIngredient,
 from data_cleaning_sets import (breakfast_list, lunch_list, dinner_list)
 from flask_mail import Mail, Message
 from isoweek import Week
+from sample_calorie_data import calorie_data
 import os
 import ingredients
 import meal_plan
+import strava_queries
 import random
 import datetime
 import time
@@ -80,7 +82,16 @@ def display_recipe_formatting():
 
     # return render_template("display_recipe.html",
     #                        recipe_text=recipe_text)
-    return render_template("test.html")
+    calories = strava_queries.get_calories()
+
+    return render_template("test.html",
+                           title_1=calories[0][0],
+                           week_1=calories[0][1])
+
+@app.route('/melon-types.json')
+def melon_types_data():
+    """Return data about Melon Sales."""
+    return jsonify(calorie_data)
 
 
 @app.route('/login')
