@@ -120,12 +120,13 @@ def welcome_login():
     user to register or re-enter credentials correctly """
 
     email = request.form.get('email')
-    password = request.form.get('password')
+    password = request.form.get('password').encode('utf-8')
 
     queried_user = User.query.filter_by(email=email).first()
+    queried_pw = queried_user.password.encode('utf-8')
 
     if queried_user:
-        if queried_user.password == password:
+        if queried_user.password == bcrypt.hashpw(password, queried_pw):
             flash("You have successfully logged in!")
             session['username'] = queried_user.username
             session['user_id'] = queried_user.user_id
@@ -148,11 +149,11 @@ def welcome_register():
     password = request.form.get('password')
     prefs = request.form.getlist('prefs')
 
-    print prefs
+    hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
     new_user = User(username=username,
                     email=email,
-                    password=password)
+                    password=hashed_pw)
 
     db.session.add(new_user)
     db.session.commit()
