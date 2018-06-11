@@ -444,9 +444,12 @@ def display_user_profile(user_id):
         else:
             past_plans[recipe.set_number] = [recipe]
 
+    calories = strava_queries.get_calories()
+
     return render_template("preferences.html",
                            user_info=user_info,
-                           past_plans=past_plans)
+                           past_plans=past_plans,
+                           calories=calories)
 
 
 @app.route('/preferences/edit', methods=["POST"])

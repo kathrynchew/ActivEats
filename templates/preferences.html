@@ -25,8 +25,9 @@
 <hr>
 <h3>Active Calories Burned</h3>
 <div class="col-sm-5">
-  <div class="card pt-3 pr-3 pl-3">
-    <canvas id="calorie-chart"></canvas>
+  <div class="card pr-3 pl-3">
+    <div class="float-right"><img src="/static/img/api_logo_cptblWith_strava_horiz_light.png" alt="Strava logo" style="width:200px"></div>
+    <div class="pt-3"><canvas id="calorie-chart"></canvas></div>
   </div>
 </div>
 <hr>
@@ -100,12 +101,6 @@
 <script type="text/javascript">
 let $jq = jQuery.noConflict();
 
-// for (var i=0; i<whatever; ++i) {
-//     d[i];
-// }
-
-// console.log({{ past_plans }});
-
 function editPreferences(evt) {
 
     document.querySelector("#pref-stuff").innerHTML = '<form id="update_pref_form" action="/preferences/edit" method="POST"><div class="form-group form-check" id="user-preferences" aria-describedby="preferenceHelp"><li class="list-group-item"><input type="checkbox" class="form-check-input" id="pref-vegetarian" name="prefs" value="Vegetarian"><label class="form-check-label" for="exampleCheck1">Vegetarian</label></li><li class="list-group-item"><input type="checkbox" class="form-check-input" id="pref-vegan" name="prefs" value="Vegan"><label class="form-check-label" for="exampleCheck1">Vegan</label></li><li class="list-group-item"><input type="checkbox" class="form-check-input" id="pref-glutenfree" name="prefs" value="Gluten Free"><label class="form-check-label" for="exampleCheck1">Gluten Free</label></li><li class="list-group-item"><input type="checkbox" class="form-check-input" id="pref-lowcarb" name="prefs" value="Low-Carb"><label class="form-check-label" for="exampleCheck1">Low-Carb</label></li><li class="list-group-item"><input type="checkbox" class="form-check-input" id="pref-lowcal" name="prefs" value="Low Calorie"><label class="form-check-label" for="exampleCheck1">Low Calorie</label></li></div><input type="submit" id="setPrefs"></form>';
@@ -138,26 +133,19 @@ document.querySelector("#editPrefs").addEventListener('click', editPreferences);
 ///// CHART GOES HERE
 let ctx = document.getElementById("calorie-chart").getContext('2d');
 
-let week_1 = 1007 + 1615 + 340;
-let week_2 = 1150;
-let week_3 = 1607 + 552 + 384;
-let week_4 = 1037 + 395 + 565;
-
 let myChart = new Chart(ctx, {
     type: 'bar',
     data: {
-    "labels": ["Untracked",
-               "Untracked",
-               "Week 21",
-               "Week 22",
-               "Week 23",
-               "Week 24"
+    "labels": [" Week {{ calories[3][0] }}",
+               "Week {{ calories[2][0] }}",
+               "Week {{ calories[1][0] }}",
+               "Week {{ calories[0][0] }}"
                ],
     "datasets": [
         {
-            "data": [0, 0, week_1, week_2, week_3, week_4],
-            "backgroundColor": ["#fcaa67", "#fcaa67", "#fcaa67", "#fcaa67", "#fcaa67", "#fcaa67"],
-            "hoverBackground Color": ["#b0413e", "#b0413e", "#b0413e", "#b0413e", "#b0413e", "#b0413e"]
+            "data": [{{ calories[3][1] }}, {{ calories[2][1] }}, {{ calories[1][1] }}, {{ calories[0][1] }}],
+            "backgroundColor": ["#fcaa67", "#fcaa67", "#fcaa67", "#fcaa67"],
+            "hoverBackground Color": ["#b0413e", "#b0413e", "#b0413e", "#b0413e"]
         }
     ]
 },

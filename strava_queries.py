@@ -43,6 +43,24 @@ def act_by_num(num):
     return client.get_activity(num)
 
 
+def process_calories(cals_info):
+
+    cals_by_week, included_weeks = cals_info
+    # cals_by_week_list = []
+    final_cals_list = []
+
+    # for key, value in sorted(cals_by_week.items(), reverse=True):
+        # cals_by_week_list.append((key, value))
+
+    for week in included_weeks:
+        if week in cals_by_week:
+            final_cals_list.append((week, cals_by_week[week]))
+        else:
+            final_cals_list.append((week, 0))
+
+    return final_cals_list
+
+
 def get_calories():
 
     this_week = Week.thisweek().week
@@ -51,7 +69,7 @@ def get_calories():
     activities = query_activities()
     acts_by_week = {}
     cals_by_week = {}
-    cals_by_week_list = []
+
 
     for act in activities:
         iter_date = act.start_date
@@ -73,7 +91,4 @@ def get_calories():
             else:
                 cals_by_week[key] = act_cals.calories
 
-    for key, value in sorted(cals_by_week.items()):
-        cals_by_week_list.append((key, value))
-
-    return cals_by_week_list
+    return process_calories([cals_by_week, included_weeks])
