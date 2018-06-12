@@ -1,7 +1,5 @@
 import os
-import requests
 import datetime
-from pprint import pprint
 from stravalib.client import Client
 from stravalib import unithelper
 from isoweek import Week
@@ -44,13 +42,16 @@ def act_by_num(num):
 
 
 def process_calories(cals_info):
+    """ Iterates over a list of weeks to be included (current week and three
+        prior weeks in reverse chronological order), matches week numbers
+        against keys in dictionary of aggregated calorie totals (keys: week #s,
+        values: calorie totals), then appends the respective week numbers and
+        calorie totals as a tuple into a list.
 
+        Returns list to get_calories() function to be returned from that
+        function."""
     cals_by_week, included_weeks = cals_info
-    # cals_by_week_list = []
     final_cals_list = []
-
-    # for key, value in sorted(cals_by_week.items(), reverse=True):
-        # cals_by_week_list.append((key, value))
 
     for week in included_weeks:
         if week in cals_by_week:
@@ -62,6 +63,16 @@ def process_calories(cals_info):
 
 
 def get_calories():
+    """ Runs all functions needed to query calories from authenticated user's
+    last 100 activities, filter for activities occurring in the current week and
+    three prior weeks, aggregate recorded calorie expenditures into per-week
+    totals, and return this data in the format of a list containing tuples of
+    week number (str), total calories (numeric) in reverse chronological order.
+
+    If no calories were recorded in a given week, a zero will be returned in
+    the calorie slot of the respective tuple.
+
+    Example: [(24, 200), (23, 582.3), (22, 1502.8), (21, 0)]"""
 
     this_week = Week.thisweek().week
     included_weeks = [str(this_week), str(this_week - 1), str(this_week - 2),
@@ -69,7 +80,6 @@ def get_calories():
     activities = query_activities()
     acts_by_week = {}
     cals_by_week = {}
-
 
     for act in activities:
         iter_date = act.start_date
