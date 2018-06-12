@@ -46,8 +46,6 @@ def display_featured_recipe():
     current_feature = FeaturedRecipe.query.filter(FeaturedRecipe.assigned_week == this_week,
                                                   FeaturedRecipe.assigned_year == this_year).first()
 
-    print current_feature
-
     if current_feature:
         return render_template("home.html",
                                recipe=current_feature.recipe)
@@ -159,11 +157,7 @@ def welcome_register():
     db.session.commit()
 
     user_prefs = Category.query.filter(Category.category_name.in_(prefs)).all()
-    print user_prefs
     added_user = User.query.filter_by(email=email).first()
-
-    print added_user
-    print added_user.user_id
 
     for item in user_prefs:
         new_pref = UserPreference(user_id=added_user.user_id,
@@ -225,11 +219,6 @@ def display_current_meal_plan():
     start_date = datetime.datetime.strptime(year + "-W" + str(thisweek) + "-1", "%Y-W%W-%w")
     start_day = start_date.strftime("%b %d, %Y")
 
-    print "isoweek"
-    print thisweek
-    print "week"
-    print week
-
     set_number = year + week
 
     user_id = session['user_id']
@@ -242,8 +231,6 @@ def display_current_meal_plan():
         prefs = db.session.query(UserPreference.category_id).filter(UserPreference.user_id == user_id).all()
         for pref in prefs:
             user_prefs.append(pref[0])
-
-        print user_prefs
 
         if len(user_prefs) > 0:
             breakfast = Category.query.filter(Category.category_name.in_(breakfast_list)).all()
@@ -386,15 +373,14 @@ def send_mail():
     by querying user's emaill address using user_id from the session. If no,
     takes in recipient email address from form on the recipe page. """
     shopping_contents = dict(request.form)
-    print shopping_contents
 
     if session['user_id']:
-        print "I'm Logged In!!!"
+        # print "I'm Logged In!!!"
         user_email = User.query.filter_by(user_id=session['user_id']).first().email
     else:
-        print "I ain't logged in!!!!"
+        # print "I ain't logged in!!!!"
         user_email = shopping_contents['user_email'][0]
-        print user_email
+        # print user_email
 
     msg = Message('Hello',
                   sender=os.environ['MAIL_USERNAME'],
@@ -411,7 +397,6 @@ def send_mail():
 def send_meal_plan_mail():
     """ Sends email for full weekly meal plan shopping list. """
     shopping_contents = dict(request.form)
-    print shopping_contents
 
     user_email = User.query.filter_by(user_id=session['user_id']).first().email
 

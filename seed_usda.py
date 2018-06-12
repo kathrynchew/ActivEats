@@ -9,42 +9,72 @@ def load_usda():
     with open('test_usda_api/usda_all.txt', 'r') as data:
         usda_data = eval(data.read())
 
-    for value in usda_data.values():
-        for report in value:
-            for food in report['foods']:
-                name = food['name']
-                ndbno = food['ndbno']
-                serving_grams = food['weight']
-                serving_string = food['measure']
+# pprint(data[7500]['report']['foods'][0])
+    print "Loading USDA Nutrition Facts"
 
-                for nutrient in food['nutrients']:
-                    if nutrient['nutrient_id'] == "208":
+    for key, value in usda_data.items():
+        # for report in value:
+            # for food in report['foods']:
+        inner = usda_data[key]['report']['foods']
+        # for food in value['report']['foods']
+        for food in inner:
+            name = food['name']
+            ndbno = food['ndbno']
+            serving_grams = food['weight']
+            serving_string = food['measure']
+
+            for nutrient in food['nutrients']:
+                if nutrient['nutrient_id'] == "208":
+                    if nutrient['value'] == '--':
+                        cals_per_serving = None
+                    else:
                         cals_per_serving = nutrient['value']
+                    if nutrient['gm'] == '--':
+                        cals_per_100g = None
+                    else:
                         cals_per_100g = nutrient['gm']
-                    elif nutrient['nutrient_id'] == "269":
+                elif nutrient['nutrient_id'] == "269":
+                    if nutrient['value'] == '--':
+                        sugar_per_serving = None
+                    else:
                         sugar_per_serving = nutrient['value']
+                    if nutrient['gm'] == '--':
+                        sugar_per_100g = None
+                    else:
                         sugar_per_100g = nutrient['gm']
-                    elif nutrient['nutrient_id'] == "204":
+                elif nutrient['nutrient_id'] == "204":
+                    if nutrient['value'] == '--':
+                        fat_per_serving = None
+                    else:
                         fat_per_serving = nutrient['value']
+                    if nutrient['gm'] == '--':
+                        fat_per_100g = None
+                    else:
                         fat_per_100g = nutrient['gm']
-                    elif nutrient['nutrient_id'] == "205":
+                elif nutrient['nutrient_id'] == "205":
+                    if nutrient['value'] == '--':
+                        carbs_per_serving = None
+                    else:
                         carbs_per_serving = nutrient['value']
+                    if nutrient['gm'] == '--':
+                        carbs_per_100g = None
+                    else:
                         carbs_per_100g = nutrient['gm']
 
-                usda_object = USDA(name=name,
-                                   ndbno=ndbno,
-                                   serving_grams=serving_grams,
-                                   serving_string=serving_string,
-                                   cals_per_serving=cals_per_serving,
-                                   cals_per_100g=cals_per_100g,
-                                   sugar_per_serving=sugar_per_serving,
-                                   sugar_per_100g=sugar_per_100g,
-                                   fat_per_serving=fat_per_serving,
-                                   fat_per_100g=fat_per_100g,
-                                   carbs_per_serving=carbs_per_serving,
-                                   carbs_per_100g=carbs_per_100g)
+            usda_object = USDA(name=name,
+                               ndbno=ndbno,
+                               serving_grams=serving_grams,
+                               serving_string=serving_string,
+                               cals_per_serving=cals_per_serving,
+                               cals_per_100g=cals_per_100g,
+                               sugar_per_serving=sugar_per_serving,
+                               sugar_per_100g=sugar_per_100g,
+                               fat_per_serving=fat_per_serving,
+                               fat_per_100g=fat_per_100g,
+                               carbs_per_serving=carbs_per_serving,
+                               carbs_per_100g=carbs_per_100g)
 
-                db.session.add(usda_object)
+            db.session.add(usda_object)
 
     db.session.commit()
 
