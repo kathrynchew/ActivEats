@@ -380,7 +380,6 @@ def send_mail():
     else:
         # print "I ain't logged in!!!!"
         user_email = shopping_contents['user_email'][0]
-        # print user_email
 
     msg = Message('Hello',
                   sender=os.environ['MAIL_USERNAME'],
@@ -397,6 +396,7 @@ def send_mail():
 def send_meal_plan_mail():
     """ Sends email for full weekly meal plan shopping list. """
     shopping_contents = dict(request.form)
+    print shopping_contents
 
     user_email = User.query.filter_by(user_id=session['user_id']).first().email
 
@@ -408,6 +408,16 @@ def send_meal_plan_mail():
                                list_content=shopping_contents['list_content'][0].rstrip().split('\n'))
     mail.send(msg)
     return "Sent"
+
+
+@app.route("/send_past", methods=["POST"])
+def send_past_plan_mail():
+    """ Generates a shopping list for a past week's meal plan and emails it to a
+    logged in user. """
+    week_to_send = dict(request.form)
+    print week_to_send
+
+    return "BUTTS"
 
 
 ################################################################################

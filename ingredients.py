@@ -1,15 +1,18 @@
 # FUNCTIONS FOR HANDLING INGREDIENT CONSOLIDATION & CALCULATION FOR SHOPPING LISTS
 from data_cleaning_sets import gram_conversions
 
+
 def fetch_ingredients(collection):
-    """ Unpacks ingredient names, amounts, units for an individual Collection 
+    """ Unpacks ingredient names, amounts, units for an individual Collection
     object (each Collection object contains only one recipe) """
 
     ingredient_list = []
+    num_servings = collection.recipe.servings_num
 
     for key, value in collection.recipe.ingredient_amounts.items():
         if value is not None:
-            data = [key, round(float(value), 2)]
+            quantity = float(value)/num_servings
+            data = [key, round(quantity, 2)]
         else:
             data = [key, 0]
         ingredient_list.append(data)
@@ -57,7 +60,7 @@ def convert_ingredients(total_ingredients):
     return sorted(final_ingredients)
 
 
-def get_shopping_list(breakfasts,lunches,dinners):
+def get_shopping_list(breakfasts, lunches, dinners):
     """ Runs all functions to get final consolidated shopping list data """
     total_ingredients = consolidate_ingredients(breakfasts, lunches, dinners)
     final_ingredients = convert_ingredients(total_ingredients)

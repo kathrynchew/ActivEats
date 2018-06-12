@@ -37,13 +37,29 @@
 
 <div class="accordion" id="accordionExample">
 
+<script type="text/javascript">  
+let $jq = jQuery.noConflict();
+
+    function emailPastList(evt) {
+        let weekToSend = $(this).val();
+        $jq.post("/send_past", {'week': weekToSend}, printButts);
+    }
+
+    function printButts(results) {
+        let butts = results;
+        console.log(butts);
+    }
+
+</script>
+
+
   {% for week in past_plans.items()|sort(reverse = True) %}
 
   <div class="card">
     <div class="card-header bg-primary text-light" id="heading{{ week[0] }}" data-toggle="collapse" data-target="#collapse{{ week[0] }}" aria-expanded="true" aria-controls="collapse{{ week[0] }}">
       <h5 class="mb-0">
         <button class="btn btn-link text-light" type="button" data-toggle="collapse" data-target="#collapse{{ week[0] }}" aria-expanded="true" aria-controls="collapse{{ week[0] }}">
-          <b>Week of {{ week[1][0].assigned_date.strftime('%b %-d, %Y') }}</b>
+          <b>Week of {{ week[1][0].assigned_date.strftime('%b %-d, %Y') }}</b>&nbsp;&nbsp;|&nbsp;&nbsp;[Week {{ week[1][0].assigned_date.strftime('%W') }}]
         </button>
       </h5>
     </div>
@@ -91,17 +107,21 @@
 
               </tbody>
           </table>
+          <hr>
+          <button type="button" class="btn btn-outline-primary float-right" id="email{{ week[0] }}" value="{{ week[0] }}">Email This Shopping List</button>
+          <br>
       </div>
     </div>
   </div>
 
+  <script type="text/javascript">
+    document.querySelector("#email{{ week[0 ]}}").addEventListener('click', emailPastList);
+  </script>
   {% endfor %}
 
 </div>
 
 <script type="text/javascript">
-let $jq = jQuery.noConflict();
-
 function editPreferences(evt) {
 
     document.querySelector("#pref-stuff").innerHTML = '<form id="update_pref_form" action="/preferences/edit" method="POST"><div class="form-group form-check" id="user-preferences" aria-describedby="preferenceHelp"><li class="list-group-item"><input type="checkbox" class="form-check-input" id="pref-vegetarian" name="prefs" value="Vegetarian"><label class="form-check-label" for="exampleCheck1">Vegetarian</label></li><li class="list-group-item"><input type="checkbox" class="form-check-input" id="pref-vegan" name="prefs" value="Vegan"><label class="form-check-label" for="exampleCheck1">Vegan</label></li><li class="list-group-item"><input type="checkbox" class="form-check-input" id="pref-glutenfree" name="prefs" value="Gluten Free"><label class="form-check-label" for="exampleCheck1">Gluten Free</label></li><li class="list-group-item"><input type="checkbox" class="form-check-input" id="pref-lowcarb" name="prefs" value="Low-Carb"><label class="form-check-label" for="exampleCheck1">Low-Carb</label></li><li class="list-group-item"><input type="checkbox" class="form-check-input" id="pref-lowcal" name="prefs" value="Low Calorie"><label class="form-check-label" for="exampleCheck1">Low Calorie</label></li></div><input type="submit" id="setPrefs"></form>';
