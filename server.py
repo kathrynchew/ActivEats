@@ -415,7 +415,16 @@ def send_past_plan_mail():
     """ Generates a shopping list for a past week's meal plan and emails it to a
     logged in user. """
     week_to_send = dict(request.form)
-    print week_to_send
+
+    breakfasts = Collection.query.filter(Collection.set_number == int(week_to_send['week'][0]),
+                                         Collection.meal_type == 'breakfast').all()
+    lunches = Collection.query.filter(Collection.set_number == int(week_to_send['week'][0]),
+                                      Collection.meal_type == 'lunch').all()
+    dinners = Collection.query.filter(Collection.set_number == int(week_to_send['week'][0]),
+                                      Collection.meal_type == 'dinner').all()
+
+    shopping_list = ingredients.get_shopping_list(breakfasts, lunches, dinners)
+    print shopping_list 
 
     return "BUTTS"
 
