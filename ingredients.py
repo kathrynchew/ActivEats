@@ -11,8 +11,11 @@ def fetch_ingredients(collection):
 
     for key, value in collection.recipe.ingredient_amounts.items():
         if value is not None:
-            quantity = float(value)/num_servings
-            data = [key, round(quantity, 2)]
+            if num_servings is not None:
+                quantity = float(value)/num_servings
+                data = [key, round(quantity, 2)]
+            else:
+                data = [key, round(float(value), 2)]
         else:
             data = [key, 0]
         ingredient_list.append(data)

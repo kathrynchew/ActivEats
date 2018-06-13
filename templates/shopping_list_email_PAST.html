@@ -1,0 +1,20 @@
+{% block content %}
+
+<h2>Remember When?</2>
+<h2>Your Meal Plan From {{ meal_plan_date }}</h2>
+
+<h4>Shopping List:</h4>
+<ul>
+{% for item in shopping_list %}
+    {% if item[2] is not none and item[1] is not none %}
+        <li>{{ item[1] }} {{ item[2] }} {{ item[0]}}</li>    
+    {% elif item[2] is not none %}
+        <li>{{ item[1] }} {{ item[0] }}</li>
+    {% else %}
+        <li>{{ item[0] }}</li>
+    {% endif %}
+{% endfor %}
+</ul>
+
+Happy Shopping!
+{% endblock %}

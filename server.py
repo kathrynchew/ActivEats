@@ -424,8 +424,18 @@ def send_past_plan_mail():
                                       Collection.meal_type == 'dinner').all()
 
     shopping_list = ingredients.get_shopping_list(breakfasts, lunches, dinners)
-    print shopping_list 
+    # print shopping_list
 
+    user_email = User.query.filter_by(user_id=session['user_id']).first().email
+
+    msg = Message('ActivEats: Your Shopping List is Here',
+                  sender=os.environ['MAIL_USERNAME'],
+                  recipients=[user_email])
+    msg.html = render_template('shopping_list_email_PAST.html',
+                               meal_plan_date=week_to_send,
+                               shopping_list=shopping_list)
+
+    mail.send(msg)
     return "BUTTS"
 
 
