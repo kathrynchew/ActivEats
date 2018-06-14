@@ -375,10 +375,8 @@ def send_mail():
     shopping_contents = dict(request.form)
 
     if session['user_id']:
-        # print "I'm Logged In!!!"
         user_email = User.query.filter_by(user_id=session['user_id']).first().email
     else:
-        # print "I ain't logged in!!!!"
         user_email = shopping_contents['user_email'][0]
 
     msg = Message('Hello',
@@ -396,7 +394,6 @@ def send_mail():
 def send_meal_plan_mail():
     """ Sends email for full weekly meal plan shopping list. """
     shopping_contents = dict(request.form)
-    print shopping_contents
 
     user_email = User.query.filter_by(user_id=session['user_id']).first().email
 
@@ -424,7 +421,6 @@ def send_past_plan_mail():
                                       Collection.meal_type == 'dinner').all()
 
     shopping_list = ingredients.get_shopping_list(breakfasts, lunches, dinners)
-    # print shopping_list
 
     user_email = User.query.filter_by(user_id=session['user_id']).first().email
 

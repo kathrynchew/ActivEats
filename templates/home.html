@@ -5,11 +5,13 @@
 <h1>Welcome to ActivEats</h1>
 <div class="card text-white bg-info mb-3">
     <div class="card-header">FEATURED RECIPE</div>
-  <img class="card-img-top" src="{{ recipe.photo_url }}" alt="{{ recipe.recipe_name }}">
+        <div style="height:300px; overflow:hidden;">
+            <img class="card-img-top" src="{{ recipe.photo_url }}" alt="{{ recipe.recipe_name }}" style="vertical-align:middle; transform:translateY(-50%);">
+        </div>
   <div class="card-body">
     <h5 class="card-title">{{ recipe.recipe_name }}</h5>
     <a href="/recipes/{{ recipe.recipe_id }}" class="btn btn-primary">View Recipe</a>
-    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+    <p class="card-text"><small class="text-muted">Last updated {{ recipe.featured_recipes[0].assigned_date }}</small></p>
   </div>
 </div>
 
