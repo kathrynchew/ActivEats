@@ -4,6 +4,7 @@
     <title>ActivEats: {% block title %} put your title here {% endblock %}</title>
     <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/site.css">
 </head>
@@ -35,7 +36,7 @@
           </li>
         {% else %}
           <li class="nav-item">
-            <a class="nav-link" href="/login">Log In</a>
+            <a class="nav-link" href="/login" id="pink-menu">Log In</a>
           </li>
         {% endif %}
           </ul>
@@ -52,7 +53,7 @@
           </div>
           {% endfor %}
     
-
+    <br>
     <div class="container">
       {% block content %} put your content here {% endblock %}
     </div>

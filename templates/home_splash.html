@@ -1,0 +1,104 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <title>ActivEats: Let's Eat!</title>
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/site.css">
+    <link rel="shortcut icon" href="/static/img/ActivEats.ico">
+</head>
+
+
+<body>
+
+    <div id="hero-image">
+
+    <nav class="navbar sticky-top navbar-expand-lg">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="/"><img src="/static/img/ActivEats-Logo.png" alt="ActivEats" width=150px></a>
+
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+          <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+              <a class="nav-link" href="/" id="white-menu">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/recipes" id="white-menu">All Recipes</a>
+            </li>
+
+        {% if session.get('username') %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">MyEats</a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="/my_week">Meal Plan</a>
+              <a class="dropdown-item" href="/profile/{{ session['user_id'] }}">Profile</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="/logout">Log Out</a>
+            </div>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="/login" id="pink-menu">Log In</a>
+          </li>
+        {% endif %}
+          </ul>
+        </div>
+    </nav>
+
+<!-- Flashed Messages -->
+
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<!-- Search Bar -->
+
+<div class="container">
+    <div class="row">
+        <div class="col-3"></div>
+        <div class="col-6">
+<!--             <div class="input-group input-group-lg"> -->
+<!--                 <div class="input-group-prepend">
+                    <span class="input-group-text" id="inputGroup-sizing-lg">Large</span>
+                </div> -->
+
+<!--                   <input type="text" class="form-control" aria-label="Search" aria-describedby="inputGroup-sizing-sm" placeholder="Find a Recipe">
+                  &nbsp;&nbsp;<button type="submit" class="btn btn-primary">Search</button>
+            </div> -->
+
+            <form class="form-inline" action="/search">
+                        <input type="text" class="form-control" name="search_term" placeholder="Find a Recipe">
+                        &nbsp;&nbsp;<button type="submit" class="btn btn-primary">Search</button>
+                    
+            </form>
+
+
+        </div>
+        <div class="col-3"></div>
+    </div>
+</div>
+
+<br>
+<br>
+<br>
+<br>
+
+</div>
+
+</body>
+
+</html>

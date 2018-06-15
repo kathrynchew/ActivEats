@@ -2,10 +2,11 @@
 {% block title %}{{ recipe_text.recipe_name }}{% endblock %}
 
 {% block content %}
-<h1>Here's a Full Recipe</h1>
+<br><br>
+<!-- <h1>Here's a Full Recipe</h1> -->
 <div class="row">
   <div class="col-sm-6">
-<h3 id="recipe-name">{{ recipe_text.recipe_name }}</h3>
+<h1 id="recipe-name">{{ recipe_text.recipe_name }}</h1>
 {% if recipe_text.recipe_author is not none %}
 by {{ recipe_text.recipe_author }}
 {% endif %}
@@ -38,6 +39,17 @@ by {{ recipe_text.recipe_author }}
 {% for item in recipe_text.recipe_categories %}
 <a href='/categories/{{ item.category_tags.category_id }}'>{{ item.category_tags.category_name }}</a>{% if not loop.last %},&nbsp;{% endif %}
 {% endfor %}
+
+<hr>
+<h4>Ingredients</h4>
+<ul>
+    {% for item in recipe_text.text_ingredients %}
+        <li>{{ item }}</li>
+    {% endfor %}
+</ul>
+
+
+
  </div>
   <div class="col-sm-6">
     <div class="card bg-light mb-3">
@@ -49,13 +61,11 @@ by {{ recipe_text.recipe_author }}
     </div>
   </div>
 </div>
-<hr>
-<h4>Ingredients</h4>
-<ul>
-    {% for item in recipe_text.text_ingredients %}
-        <li>{{ item }}</li>
-    {% endfor %}
-</ul>
+
+
+
+
+
 <hr>
 <h4>Preparation Instructions</h4>
 <ul>

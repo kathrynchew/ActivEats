@@ -7,3 +7,71 @@
        -moz-column-count: 2;
             column-count: 2;
 }
+
+body {
+    background-color: #f8efe9;
+    font-family: "Roboto Condensed";
+}
+
+/* Home Page */
+
+#hero-image {
+    background: url("/static/img/SplitShire_IMG_9951.jpg") no-repeat center center;
+    background-size: cover;
+}
+
+#white-menu {
+    color: white !important;
+}
+
+/*Generic; whole site*/
+
+a {
+    color: #32aca5;
+}
+
+.list-group-item.active {
+    background-color: #485665;
+    border-color: #01172f;
+}
+
+.btn.btn-light.btn-sm.float-right {
+    background-color: #f8efe9;
+}
+
+.list-group-item {
+    border-color: #01172f;
+}
+
+.card-header.bg-primary.text-light {
+    background-color: #485665 !important; 
+    border-color: #01172f !important;   
+}
+
+.card {
+    border-color: #01172f !important;
+}
+
+.btn-primary {
+    background-color: #ea4f76;
+    border-color: #ced4da;    
+}
+
+
+/* Navbar Styling */
+
+.navbar.sticky-top.navbar-expand-lg.navbar-dark.bg-dark {
+    background-color: #01172f !important;
+}
+
+#pink-menu {
+    color: #ea4f76 !important;
+}
+
+#navbarDropdown {
+    color: #ea4f76 !important;
+}
+
+.nav-link {
+    color: white !important;
+}
