@@ -15,16 +15,59 @@ body {
 
 /* Home Page */
 
+#splash-body {
+    background-color: #01172f;
+}
+
 #hero-image {
     background: url("/static/img/SplitShire_IMG_9951.jpg") no-repeat center center;
     background-size: cover;
+}
+
+#splash-text {
+    background-color: #01172f;
+    color: white;
+}
+
+#centered-col {
+    margin: 0 auto;
 }
 
 #white-menu {
     color: white !important;
 }
 
-/*Generic; whole site*/
+#splash-title {
+    width: 250px;
+}
+
+
+/* Login/Register Page */
+
+#login-tab {
+    color: #485665 !important;
+}
+
+#register-tab {
+    color: #486556 !important;
+}
+
+
+/*User Profile*/
+    /*Strava Branded Content*/
+
+#strava-link {
+    color: #FC4C02;
+    font-size: small;
+    font-weight: 700;
+}
+
+#strava-img {
+    float: right;
+}
+
+
+/* Generic; whole site */
 
 a {
     color: #32aca5;
@@ -55,6 +98,12 @@ a {
 .btn-primary {
     background-color: #ea4f76;
     border-color: #ced4da;    
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open>.dropdown-toggle.btn-primary {
+    color: #fff;
+    background-color: #802c41;
+    border-color: #ced4da; /*set the color you want here*/
 }
 
 

@@ -13,7 +13,7 @@
 </head>
 
 
-<body>
+<body id="splash-body">
 
     <div id="hero-image">
 
@@ -64,6 +64,8 @@
 <br>
 <br>
 <br>
+<br>
+<br>
 
 <!-- Search Bar -->
 
@@ -71,17 +73,9 @@
     <div class="row">
         <div class="col-3"></div>
         <div class="col-6">
-<!--             <div class="input-group input-group-lg"> -->
-<!--                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="inputGroup-sizing-lg">Large</span>
-                </div> -->
-
-<!--                   <input type="text" class="form-control" aria-label="Search" aria-describedby="inputGroup-sizing-sm" placeholder="Find a Recipe">
-                  &nbsp;&nbsp;<button type="submit" class="btn btn-primary">Search</button>
-            </div> -->
 
             <form class="form-inline" action="/search">
-                        <input type="text" class="form-control" name="search_term" placeholder="Find a Recipe">
+                        <input type="text" class="form-control" name="search_term" placeholder="Find a Recipe" style="width:85%">
                         &nbsp;&nbsp;<button type="submit" class="btn btn-primary">Search</button>
                     
             </form>
@@ -96,7 +90,49 @@
 <br>
 <br>
 <br>
+<br>
+<br>
+<br>
 
+
+</div>
+
+
+<!-- Card Deck -- About Site -->
+
+<br>
+<br>
+
+<div class="container">
+
+    <div class="col-10" id="centered-col">
+
+        <div class="card-deck">
+          <div class="card text-center">
+            <img class="card-img-top" src="/static/img/salad.png" alt="Salad">
+            <div class="card-body" id="splash-text">
+              <h5 class="card-title">Set Preferences</h5>
+              <p class="card-text">Registered users can set dietary preferences such as vegetarian, vegan, low-carb, or low calorie!</p>
+            </div>
+          </div>
+          <div class="card text-center">
+            <img class="card-img-top" src="/static/img/booking.png" alt="Meal Plan">
+            <div class="card-body" id="splash-text">
+              <h5 class="card-title"><img src="/static/img/meal_planning_title.png" alt="Meal Planning" id="splash-title"></h5>
+              <p class="card-text">ActivEats can generate a weekly meal plan for you and email you a shopping list.</p>
+            </div>
+          </div>
+          <div class="card text-center">
+            <img class="card-img-top" src="/static/img/runner.png" alt="Runner">
+            <div class="card-body" id="splash-text">
+              <h5 class="card-title"><img src="/static/img/get_active_title.png" alt="Get Active!" id="splash-title"></h5>
+              <p class="card-text">Connect your Strava account to track your weekly active calorie burn and compare it to the calorie intake in your meal plan.</p>
+            </div>
+          </div>
+        </div>
+
+
+    </div>
 </div>
 
 </body>
