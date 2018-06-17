@@ -19,8 +19,12 @@ body {
     background-color: #01172f;
 }
 
+#splash-icon {
+    background-color: #01172f;
+}
+
 #hero-image {
-    background: url("/static/img/SplitShire_IMG_9951.jpg") no-repeat center center;
+    background: linear-gradient(to bottom, transparent 0%, #01172f 100%), url("/static/img/SplitShire_IMG_9951.jpg") no-repeat center center;
     background-size: cover;
 }
 
@@ -73,6 +77,10 @@ a {
     color: #32aca5;
 }
 
+a:hover, a:focus, a:active {
+    color: #298d88;
+}
+
 .list-group-item.active {
     background-color: #485665;
     border-color: #01172f;
@@ -104,6 +112,19 @@ a {
     color: #fff;
     background-color: #802c41;
     border-color: #ced4da; /*set the color you want here*/
+}
+
+.btn.btn-outline-primary {
+    color: #32aca5;
+    outline-color: #32aca5;
+    border-color: #32aca5;
+}
+
+.btn-outline-primary:hover, .btn-outline-primary:focus, .btn-outline-primary:active {
+    color: #fff;
+    outline-color: #32aca5;
+    background-color: #298d88;
+    border-color: #32aca5;
 }
 
 

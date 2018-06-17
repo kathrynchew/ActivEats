@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}My Weekly Meal Plan{% endblock %}
 {% block content %}
-<h1>{{ session['username'] }}'s Meal Plan</h1>
+<h1><img src="/static/img/booking_black.png" width="50px">&nbsp;&nbsp;{{ session['username'] }}'s Meal Plan</h1>
 <hr>
 <h2 id="setName">Week of {{ start_day }}</h2>
 <table class="table table-striped table-dark table-borderless">

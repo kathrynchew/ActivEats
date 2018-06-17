@@ -21,13 +21,14 @@
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand" href="/"><img src="/static/img/ActivEats-Logo.png" alt="ActivEats" width=150px></a>
+        <a class="navbar-brand" href="/"><img src="/static/img/ActivEats-Logo.png" alt="ActivEats" width=300px></a>
 
         <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
-          <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-            <li class="nav-item active">
+          <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+
+<!--             <li class="nav-item active">
               <a class="nav-link" href="/" id="white-menu">Home <span class="sr-only">(current)</span></a>
-            </li>
+            </li> -->
             <li class="nav-item">
               <a class="nav-link" href="/recipes" id="white-menu">All Recipes</a>
             </li>
@@ -35,7 +36,7 @@
         {% if session.get('username') %}
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">MyEats</a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown" id="dropDownSwap">
               <a class="dropdown-item" href="/my_week">Meal Plan</a>
               <a class="dropdown-item" href="/profile/{{ session['user_id'] }}">Profile</a>
               <div class="dropdown-divider"></div>
@@ -47,6 +48,7 @@
             <a class="nav-link" href="/login" id="pink-menu">Log In</a>
           </li>
         {% endif %}
+
           </ul>
         </div>
     </nav>
@@ -93,6 +95,9 @@
 <br>
 <br>
 <br>
+<br>
+<br>
+<br>
 
 
 </div>
@@ -108,21 +113,21 @@
     <div class="col-10" id="centered-col">
 
         <div class="card-deck">
-          <div class="card text-center">
+          <div class="card text-center" id="splash-icon">
             <img class="card-img-top" src="/static/img/salad.png" alt="Salad">
             <div class="card-body" id="splash-text">
-              <h5 class="card-title">Set Preferences</h5>
+              <h5 class="card-title"><img src="/static/img/set_preferences_title.png" alt="Set Preferences" id="splash-title"></h5>
               <p class="card-text">Registered users can set dietary preferences such as vegetarian, vegan, low-carb, or low calorie!</p>
             </div>
           </div>
-          <div class="card text-center">
+          <div class="card text-center" id="splash-icon">
             <img class="card-img-top" src="/static/img/booking.png" alt="Meal Plan">
             <div class="card-body" id="splash-text">
               <h5 class="card-title"><img src="/static/img/meal_planning_title.png" alt="Meal Planning" id="splash-title"></h5>
               <p class="card-text">ActivEats can generate a weekly meal plan for you and email you a shopping list.</p>
             </div>
           </div>
-          <div class="card text-center">
+          <div class="card text-center" id="splash-icon">
             <img class="card-img-top" src="/static/img/runner.png" alt="Runner">
             <div class="card-body" id="splash-text">
               <h5 class="card-title"><img src="/static/img/get_active_title.png" alt="Get Active!" id="splash-title"></h5>
@@ -136,5 +141,26 @@
 </div>
 
 </body>
+
+
+<!-- Force Drop Down to Work :'( -->
+
+<script type="text/javascript">
+
+function openDropdown(evt) {
+    let menuToggle = document.querySelector("#dropDownSwap");
+
+    if (menuToggle.classList.contains("show")) {
+        menuToggle.classList.remove("show");
+    }
+    else {
+        menuToggle.classList.add("show");
+    }
+}
+
+document.querySelector("#navbarDropdown").addEventListener('click', openDropdown);
+</script>
+
+
 
 </html>

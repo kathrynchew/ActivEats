@@ -40,6 +40,25 @@ mail = Mail(app)
 @app.route('/')
 def display_featured_recipe():
     """ Home page """
+    return render_template("home_splash.html")
+
+
+@app.route('/test')
+def display_recipe_formatting():
+    """ Figure out how to display a recipe """
+    # # recipe_id = random.randint(1, 990)
+
+    # # recipe_text = Recipe.query.filter_by(recipe_id=recipe_id).first()
+
+    # # print recipe_text.recipe_categories
+
+    # # return render_template("display_recipe.html",
+    # #                        recipe_text=recipe_text)
+    # calories = strava_queries.get_calories()
+
+    # return render_template("test.html",
+    #                        title_1=calories[0][0],
+    #                        week_1=calories[0][1])
     this_year = datetime.date.today().strftime('%Y')
     this_week = datetime.date.today().strftime('%W')
 
@@ -68,25 +87,6 @@ def display_featured_recipe():
 
         return render_template("home.html",
                                recipe=featured_recipe)
-
-
-@app.route('/test')
-def display_recipe_formatting():
-    """ Figure out how to display a recipe """
-    # # recipe_id = random.randint(1, 990)
-
-    # # recipe_text = Recipe.query.filter_by(recipe_id=recipe_id).first()
-
-    # # print recipe_text.recipe_categories
-
-    # # return render_template("display_recipe.html",
-    # #                        recipe_text=recipe_text)
-    # calories = strava_queries.get_calories()
-
-    # return render_template("test.html",
-    #                        title_1=calories[0][0],
-    #                        week_1=calories[0][1])
-    return render_template("home_splash.html")
 
 
 @app.route('/melon-types.json')
