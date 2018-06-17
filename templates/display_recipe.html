@@ -54,9 +54,10 @@ by {{ recipe_text.recipe_author }}
   <div class="col-sm-6">
     <div class="card bg-light mb-3">
       <div class="card-body">
-        <h5 class="card-title shopping-title">Generate Shopping List</h5>
+<!--         Generate Shopping List -->
+        <h5 class="card-title shopping-title"><img src="/static/img/shopping_list_logo.png" alt="Generate Shopping List" id="shopping-title" width="150px"></h5>
         <p class="card-text shopping-list">Click the button to generate a shopping list for this recipe</p>
-        <form name="notLoggedIn" id="notLoggedIn" style="float: left"></form><a href="#" class="btn btn-primary shopping-button" id="generate-button">Generate</a><div id="email-results"></div>
+        <form name="notLoggedIn" id="notLoggedIn" style="float: left"></form><a href="#" class="btn btn-primary shopping-button" id="generate-button">Generate</a><div id="email-results" style="display:none"><h3>Email Successful!</h3></div>
       </div>
     </div>
   </div>
@@ -74,18 +75,25 @@ by {{ recipe_text.recipe_author }}
     {% endfor %} 
 </ul>
 <br>
-<a href="{{ recipe_text.recipe_url }}">Click</a> to view original.
+<a href="{{ recipe_text.recipe_url }}">Click to view original.</a>
 
 <script type="text/javascript">
 let $jq = jQuery.noConflict();
 
+function emailSentConfirmLoggedOut(results) {
+    let emailStatus = results;
+    document.querySelector('#email-results').setAttribute("style", "display:unset");
+    document.querySelector('#email-button').setAttribute("style", "display:none");
+        document.querySelector('#inputEmail').setAttribute("style", "display:none");
+}
+
 function emailSentConfirm(results) {
     let emailStatus = results;
-    document.querySelector('#email-results').innerText = "Email Successful";
+    document.querySelector('#email-results').setAttribute("style", "display:unset");
+    document.querySelector('#generate-button').setAttribute("style", "display:none");
 }
 
 function emailShoppingList(evt) {
-    console.log('WE LOGGED IN BRO');
     let listContent = document.querySelector('.shopping-list').innerText;
     let recipeName = document.querySelector('#recipe-name').innerText;
 
@@ -99,7 +107,6 @@ $jq.post("/send",
 function emailLoggedOut(evt) {
     let userEmail = document.querySelector('#inputEmail').value;
     
-    console.log('WE NOT LOGGED IN BRO');
     let listContent = document.querySelector('.shopping-list').innerText;
     let recipeName = document.querySelector('#recipe-name').innerText;
 
@@ -108,20 +115,21 @@ function emailLoggedOut(evt) {
              {'list_content': listContent,
               'recipe_name': recipeName,
               'user_email': userEmail},
-              emailSentConfirm);
+              emailSentConfirmLoggedOut);
     }   else {
             $jq.post("/send",
                      {'list_content': listContent,
                       'recipe_name': recipeName},
-                     emailSentConfirm);
+                     emailSentConfirmLoggedOut);
         }
 
 }
 
+
 function generateShoppingList(evt) {
     document.querySelector('.shopping-button').removeEventListener('click', generateShoppingList);
-    document.querySelector('.shopping-title').innerText = "Shopping List";
-    document.querySelector('.shopping-list').innerHTML = "<ul>{% for item in shopping_list %}<li>{{ item[1] }} {{ item[2] }} {{ item[0] }}</li>{% endfor %}</ul>";
+    // document.querySelector('.shopping-title').innerText = "Shopping List";
+    document.querySelector('.shopping-list').innerHTML = "<ul>{% for item in shopping_list %}{% if item[1] is not none and item[2] is not none %}<li>{{ item[1] }} {{ item[2] }} {{ item[0] }}</li>{% elif item[1] is not none %}<li>{{ item [1] }} {{ item[0] }}</li>{% else %}<li>{{ item[0] }}</li>{% endif %}{% endfor %}</ul>";
     document.querySelector('.shopping-button').innerText = "Email This List";
 
     if (typeof {{ session['user_id'] }} === 'undefined') {

@@ -90,8 +90,6 @@ def get_calories():
             else:
                 acts_by_week[iter_week] = [act.id]
 
-    print acts_by_week
-
     for key, value in acts_by_week.items():
         for act_id in value:
             act_cals = act_by_num(act_id)

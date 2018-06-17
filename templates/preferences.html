@@ -42,12 +42,13 @@ let $jq = jQuery.noConflict();
 
     function emailPastList(evt) {
         let weekToSend = $(this).val();
-        $jq.post("/send_past", {'week': weekToSend}, printButts);
+        $jq.post("/send_past", {'week': weekToSend}, emailSuccess);
     }
 
-    function printButts(results) {
-        let butts = results;
-        console.log(butts);
+    function emailSuccess(results) {
+        document.querySelector("#email-results-right-" + results).removeAttribute("style", "display:none");
+        document.querySelector("#email" + results).setAttribute("style", "display:none");
+
     }
 
 </script>
@@ -108,7 +109,7 @@ let $jq = jQuery.noConflict();
               </tbody>
           </table>
           <hr>
-          <button type="button" class="btn btn-outline-primary float-right" id="email{{ week[0] }}" value="{{ week[0] }}">Email This Shopping List</button>
+          <button type="button" class="btn btn-outline-primary float-right" id="email{{ week[0] }}" value="{{ week[0] }}">Email This Shopping List</button><div class="float-right" id="email-results-right-{{ week[0] }}" style="display:none"><h3>Email Successful!</h3></div>
           <br>
       </div>
     </div>

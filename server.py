@@ -434,7 +434,7 @@ def send_past_plan_mail():
                                shopping_list=shopping_list)
 
     mail.send(msg)
-    return "BUTTS"
+    return week_to_send['week'][0]
 
 
 ################################################################################

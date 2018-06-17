@@ -36,10 +36,11 @@
   <div class="col">
     <div class="card bg-light mb-3">
       <div class="card-body" id="shopping-list">
-        <h5 class="card-title shopping-title">Generate & Email Shopping List</h5>
+        <h5 class="card-title shopping-title"><img src="/static/img/shopping_list_email_logo.png" width="400px" id="shopping-title"></h5>
         <p class="card-text shopping-list">Click the button to generate a shopping list</p>
         <a href="#" class="btn btn-primary shopping-button">Generate</a>
         <a href="#" class="btn btn-primary email-button" style="display: none">Email This List</a>
+        <div id="email-results" style="display:none"><h3>Email Successful!</h3></div>
       </div>
     </div>
   </div>
@@ -52,7 +53,8 @@ let $jq = jQuery.noConflict();
 
 function emailSentConfirm(results) {
     if (results==="Sent") {
-        console.log("I'm a little teapot!")
+        document.querySelector("#email-results").removeAttribute("style", "display:none");
+        document.querySelector(".email-button").setAttribute("style", "display:none")
     }
 }
 
@@ -68,7 +70,8 @@ function emailShoppingList(evt) {
 
 function generateShoppingList(evt) {
 
-    document.querySelector('.shopping-title').innerText = "Shopping List"
+    document.querySelector('#shopping-title').setAttribute("src", "/static/img/shopping_list_logo.png");
+    document.querySelector('#shopping-title').setAttribute("width", "150px");
     document.querySelector('.shopping-list').innerHTML = '<ul id="article">{% for ingredient in ingredients %}{% if ingredient[1] == 0 %}<li>{{ ingredient[0] }}</li>{% elif ingredient[2] is none %}<li>{{ ingredient[1] }} pieces {{ ingredient[0] }}</li>{% else %}<li>{{ ingredient[1] }} {{ ingredient[2] }}s {{ ingredient[0] }}</li>{% endif %}{% endfor %}</ul>'
     document.querySelector('.shopping-button').setAttribute("style", "display: none");
     document.querySelector('.email-button').removeAttribute("style", "display: none");

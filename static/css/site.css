@@ -24,7 +24,7 @@ body {
 }
 
 #hero-image {
-    background: linear-gradient(to bottom, transparent 0%, #01172f 100%), url("/static/img/SplitShire_IMG_9951.jpg") no-repeat center center;
+    background: linear-gradient(to bottom, transparent 45%, #01172f 100%), url("/static/img/SplitShire_IMG_9951.jpg") no-repeat center center;
     background-size: cover;
 }
 
@@ -108,10 +108,10 @@ a:hover, a:focus, a:active {
     border-color: #ced4da;    
 }
 
-.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open>.dropdown-toggle.btn-primary {
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .open>.dropdown-toggle.btn-primary {
     color: #fff;
     background-color: #802c41;
-    border-color: #ced4da; /*set the color you want here*/
+    border-color: #ced4da;
 }
 
 .btn.btn-outline-primary {
@@ -126,6 +126,16 @@ a:hover, a:focus, a:active {
     background-color: #298d88;
     border-color: #32aca5;
 }
+
+#email-results {
+    color: #ea4f76;
+}
+
+*[id^='email-results-right-'] {
+    /*float: right;*/
+    color: #ea4f76;
+}
+
 
 
 /* Navbar Styling */

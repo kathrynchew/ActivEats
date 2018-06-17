@@ -158,7 +158,9 @@ function openDropdown(evt) {
     }
 }
 
-document.querySelector("#navbarDropdown").addEventListener('click', openDropdown);
+if (typeof(document.querySelector("#navbarDropdown"))!== 'undefined') {
+  document.querySelector("#navbarDropdown").addEventListener('click', openDropdown);
+}
 </script>
 
 
