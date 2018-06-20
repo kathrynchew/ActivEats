@@ -527,7 +527,7 @@ if __name__ == "__main__":
     connect_to_db(app)
 
     # Use the DebugToolbar  
-    DebugToolbarExtension(app)
+    # DebugToolbarExtension(app)
 
     # Stop the Debbugger from freaking out every time there is a redirect
     app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False

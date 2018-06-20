@@ -28,6 +28,11 @@ body {
     background-size: cover;
 }
 
+#hero-image-2 {
+    background: linear-gradient(to top, transparent 60%, #01172f 100%), linear-gradient(to bottom, transparent 80%, #01172f 100%), url("/static/img/SplitShire-08043.jpg") no-repeat center 60%;
+    background-size: cover;
+}
+
 #splash-text {
     background-color: #01172f;
     color: white;
@@ -58,6 +63,7 @@ body {
 
 
 /*User Profile*/
+
     /*Strava Branded Content*/
 
 #strava-link {
@@ -131,11 +137,22 @@ a:hover, a:focus, a:active {
     color: #ea4f76;
 }
 
-*[id^='email-results-right-'] {
+*[id^='email-results-right-'] {     /* Allows wildcard selector for jinja generated id names */
     /*float: right;*/
     color: #ea4f76;
 }
 
+#footer {
+    color: white;
+    float:right;
+    text-align: right;
+    font-size: small;
+    font-weight: 200;
+}
+
+hr.white {
+    background-color: white;
+}
 
 
 /* Navbar Styling */
@@ -155,3 +172,8 @@ a:hover, a:focus, a:active {
 .nav-link {
     color: white !important;
 }
+
+.dropdown-item:active {
+    background-color: #485665;
+}
+
