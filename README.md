@@ -1,7 +1,8 @@
 ![alt text][logo]
 
 ```sh 
-NOTE: This app was created as a capstone project for Hackbright Academy Full Stack Software Engineering Bootcamp. It is a work in progress. 
+NOTE: This app was created as a capstone project for Hackbright Academy Full Stack 
+Software Engineering Bootcamp. It is a work in progress. 
 ```
 ----
 
